@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings | CineVerse</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Page-specific styles for My Bookings */
+        .page-my-bookings .main-container {
+            max-width: 1000px; /* Adjust as needed */
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: calc(var(--spacing-unit) * 4); /* 32px */
+        }
+        .page-header h1 {
+            font-size: var(--font-size-h2); /* 32px */
+            color: var(--color-text-primary);
+        }
+        .page-header p {
+            font-size: var(--font-size-lg); /* 18px */
+            color: var(--color-text-secondary);
+        }
+
+        .bookings-list {
+            display: flex;
+            flex-direction: column;
+            gap: calc(var(--spacing-unit) * 3); /* 24px */
+        }
+
+        .booking-card {
+            background-color: var(--color-surface-primary);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--color-border-divider);
+            display: flex;
+            overflow: hidden; /* To contain poster image */
+            transition: var(--transition-main);
+        }
+        .booking-card:hover {
+            border-color: var(--color-accent-primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .booking-poster {
+            flex-shrink: 0;
+            width: 130px; /* Adjust poster width */
+            height: auto; /* Maintain aspect ratio */
+        }
+        .booking-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .booking-details {
+            padding: calc(var(--spacing-unit) * 2.5); /* 20px */
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .booking-details-header h3 { /* Movie Title */
+            font-size: var(--font-size-xl); /* 20px */
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-unit);
+        }
+
+        .booking-info {
+            font-size: var(--font-size-sm); /* 14px */
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-unit);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-unit);
+        }
+        .booking-info span {
+            display: flex;
+            align-items: center;
+        }
+        .booking-info i {
+            margin-right: calc(var(--spacing-unit) * 0.75); /* 6px */
+            color: var(--color-accent-tertiary);
+            width: 16px;
+            text-align: center;
+        }
+        .booking-info strong {
+            color: var(--color-text-primary);
+            font-weight: 500;
+        }
+        
+        .booking-status {
+            font-weight: 600;
+            padding: calc(var(--spacing-unit) * 0.5) var(--spacing-unit);
+            border-radius: var(--border-radius-pill);
+            font-size: var(--font-size-sm);
+            display: inline-block;
+            margin-top: var(--spacing-unit);
+        }
+        .booking-status.confirmed {
+            background-color: var(--color-success-bg);
+            color: var(--color-success);
+            border: 1px solid var(--color-success);
+        }
+        .booking-status.cancelled {
+            background-color: var(--color-error-bg);
+            color: var(--color-error);
+            border: 1px solid var(--color-error);
+        }
+
+
+        .booking-actions {
+            margin-top: calc(var(--spacing-unit) * 2); /* 16px */
+            text-align: right;
+        }
+       
+        .no-bookings-message {
+            text-align: center;
+            padding: calc(var(--spacing-unit) * 5) 0; /* 40px */
+            font-size: var(--font-size-lg);
+            color: var(--color-text-secondary);
+        }
+        .no-bookings-message i {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: var(--spacing-unit);
+            color: var(--color-accent-tertiary);
+        }
+
+        @media (max-width: 600px) {
+            .booking-card {
+                flex-direction: column;
+            }
+            .booking-poster {
+                width: 100%;
+                height: 200px; /* Fixed height for poster in column layout */
+            }
+            .booking-poster img {
+                object-position: center top; /* Focus on top part of poster */
+            }
+        }
+    </style>
+</head>
+<body class="page-my-bookings">
+
+    <header class="app-header">
+        <div class="header-content">
+            <a href="/user-dashboard.html" class="header-logo">
+                <i class="fas fa-film"></i>
+                <span>CineVerse</span>
+            </a>
+            <nav class="header-nav">
+                <a href="/user-dashboard.html" class="nav-link">Now Showing</a>
+                <a href="/my-bookings.html" class="nav-link active">My Bookings</a>
+            </nav>
+            <div class="user-profile">
+                <button id="themeSwitcher" class="theme-switcher" title="Toggle theme">
+                    <i class="fas fa-sun theme-switcher-icon"></i>
+                    <i class="fas fa-moon theme-switcher-icon"></i>
+                </button>
+                <span id="userWelcomeText" class="welcome-text">Welcome!</span>
+                <button class="btn btn-icon btn-logout" id="logoutButton" aria-label="Logout" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="page-header">
+            <h1>My Bookings</h1>
+            <p>View and manage your movie ticket bookings.</p>
+        </div>
+
+        <div id="bookingsListContainer" class="bookings-list">
+            </div>
+
+        <div id="loadingBookingsIndicator" class="loading-indicator" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i> Loading your bookings...
+        </div>
+
+        <div id="bookingsMessage" class="message-area" style="display: none;">
+            </div>
+    </main>
+
+    <footer class="app-footer">
+        <p>&copy; <span id="currentYear"></span> CineVerse. All rights reserved.</p>
+    </footer>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/my-bookings.js"></script>
+    <script src="/js/theme-switcher.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Your Payment | CineVerse</title>
+    <link rel="stylesheet" href="/css/style.css"> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        /* Styles from your existing payment.html */
+        /* These styles should ideally be in your main /css/style.css for consistency */
+        /* but are kept here if they are page-specific overrides or additions */
+        .page-payment .app-header {
+            border-bottom: 1px solid var(--color-border-divider);
+        }
+        .payment-layout-grid {
+            display: grid;
+            grid-template-columns: 1fr; 
+            gap: calc(var(--spacing-unit) * 4); 
+            align-items: flex-start;
+        }
+        @media (min-width: 992px) { 
+            .payment-layout-grid {
+                grid-template-columns: 1.2fr 2fr; /* Order summary first, then payment form */
+            }
+        }
+
+        .booking-summary-card, .payment-form-card {
+            background-color: var(--color-surface-primary);
+            padding: calc(var(--spacing-unit) * 3); 
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--color-border-divider);
+        }
+        .booking-summary-card h3, .payment-form-card h3 {
+            font-size: var(--font-size-xl); 
+            color: var(--color-text-primary);
+            margin-bottom: calc(var(--spacing-unit) * 2.5); 
+            padding-bottom: var(--spacing-unit);
+            border-bottom: 1px solid var(--color-border-divider);
+            display: flex;
+            align-items: center;
+        }
+        .booking-summary-card h3 i, .payment-form-card h3 i {
+            margin-right: var(--spacing-unit);
+            color: var(--color-accent-primary);
+        }
+
+        .summary-item-payment {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--font-size-sm); 
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-unit);
+            padding: calc(var(--spacing-unit) * 0.5) 0;
+        }
+        .summary-item-payment .label {
+            font-weight: 500;
+        }
+        .summary-item-payment .value {
+            color: var(--color-text-primary);
+            font-weight: 600;
+            text-align: right;
+        }
+        .summary-item-payment.discount {
+            color: var(--color-success);
+        }
+        .summary-item-payment.discount .value {
+            color: var(--color-success);
+        }
+
+        .summary-total-payment {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--font-size-lg); 
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-top: calc(var(--spacing-unit) * 2);
+            padding-top: calc(var(--spacing-unit) * 2);
+            border-top: 1px solid var(--color-border-divider);
+        }
+        .summary-total-payment .value {
+            color: var(--color-accent-primary);
+        }
+
+        .payment-method-tabs {
+            display: flex;
+            gap: var(--spacing-unit);
+            margin-bottom: calc(var(--spacing-unit) * 3); 
+        }
+        .payment-method-tab {
+            flex-grow: 1;
+            padding: calc(var(--spacing-unit) * 1.5) var(--spacing-unit); 
+            background-color: var(--color-surface-secondary);
+            color: var(--color-text-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--border-radius-sm);
+            font-weight: 500;
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: var(--transition-colors), box-shadow var(--transition-duration-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-unit);
+        }
+        .payment-method-tab:hover {
+            background-color: var(--color-surface-primary);
+            color: var(--color-text-primary);
+        }
+        .payment-method-tab.active {
+            background-color: var(--color-accent-primary);
+            color: var(--color-text-on-accent);
+            border-color: var(--color-accent-primary);
+            box-shadow: 0 0 8px var(--color-accent-primary-glow);
+        }
+
+        .payment-details-section { display: none; }
+        .payment-details-section.active { display: block; animation: fadeIn 0.3s var(--transition-timing-function); }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-row-payment { display: flex; gap: calc(var(--spacing-unit) * 2); }
+        .form-row-payment .form-group { flex: 1; }
+
+        .upi-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: calc(var(--spacing-unit) * 3);
+            align-items: center;
+        }
+        @media(min-width: 640px) { .upi-grid { grid-template-columns: auto 1fr; } } 
+        
+        .qr-code-area { text-align: center; }
+        #qrCodeDisplay {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto calc(var(--spacing-unit) * 1.5) auto;
+            background-color: white; 
+            padding: var(--spacing-unit);
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--color-border-primary);
+        }
+        #qrCodeDisplay img { max-width: 100%; max-height: 100%; }
+        .qr-message { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
+
+        .pay-securely-btn {
+            margin-top: calc(var(--spacing-unit) * 4); 
+            font-size: var(--font-size-lg);
+            padding: calc(var(--spacing-unit) * 1.75) calc(var(--spacing-unit) * 3.5); 
+        }
+
+        /* Discount Code Input Styles */
+        .discount-code-section {
+            margin-bottom: calc(var(--spacing-unit) * 3); /* Added margin-bottom to separate from email field */
+            /* padding-top: calc(var(--spacing-unit) * 3); */ /* Removed top padding if it's first */
+            /* border-top: 1px solid var(--color-border-divider); */ /* Removed top border if it's first */
+        }
+        .discount-code-section h4 {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-primary);
+            margin-bottom: calc(var(--spacing-unit) * 1.5);
+        }
+        .discount-input-group {
+            display: flex;
+            gap: var(--spacing-unit);
+            align-items: stretch; 
+        }
+        .discount-input-group .form-control {
+            flex-grow: 1;
+            margin-bottom: 0; 
+        }
+        .discount-input-group .btn {
+            flex-shrink: 0; 
+        }
+        #discountMessage {
+            margin-top: var(--spacing-unit);
+            font-size: var(--font-size-sm);
+        }
+
+    </style>
+</head>
+<body class="page-payment">
+
+    <header class="app-header">
+        <div class="header-content">
+            <a href="/user-dashboard.html" class="header-logo">
+                <i class="fas fa-film"></i>
+                <span>CineVerse Checkout</span>
+            </a>
+            <div class="user-profile">
+                <button id="themeSwitcher" class="theme-switcher" title="Toggle theme">
+                    <i class="fas fa-sun theme-switcher-icon"></i>
+                    <i class="fas fa-moon theme-switcher-icon"></i>
+                </button>
+                <span id="userWelcomeText" class="welcome-text">Welcome!</span>
+                <button class="btn btn-icon btn-logout" id="logoutButton" aria-label="Logout" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="payment-layout-grid">
+            <section class="booking-summary-card">
+                <h3><i class="fas fa-receipt"></i>Your Order</h3>
+                <div id="bookingSummaryContent">
+                    <div class="summary-item-payment">
+                        <span class="label">Movie:</span>
+                        <span class="value" id="summaryMovieTitle">Loading...</span>
+                    </div>
+                    <div class="summary-item-payment">
+                        <span class="label">Theatre:</span>
+                        <span class="value" id="summaryTheatreName">Loading...</span>
+                    </div>
+                    <div class="summary-item-payment">
+                        <span class="label">Screen:</span>
+                        <span class="value" id="summaryScreenNumber">Loading...</span>
+                    </div>
+                    <div class="summary-item-payment">
+                        <span class="label">Date & Time:</span>
+                        <span class="value" id="summaryShowDateTime">Loading...</span>
+                    </div>
+                    <div class="summary-item-payment">
+                        <span class="label">Seats:</span>
+                        <span class="value" id="summarySeatsInfo">Loading...</span>
+                    </div>
+                    <div class="summary-item-payment">
+                        <span class="label">Tickets:</span>
+                        <span class="value" id="summaryTicketCount">Loading...</span>
+                    </div>
+                    <div class="summary-item-payment" id="subtotalRow">
+                        <span class="label">Subtotal:</span>
+                        <span class="value" id="summarySubtotalAmount">₹0.00</span>
+                    </div>
+                    <div class="summary-item-payment discount" id="discountRow" style="display: none;">
+                        <span class="label">Discount (<span id="appliedDiscountCode"></span>):</span>
+                        <span class="value" id="summaryDiscountApplied">- ₹0.00</span>
+                    </div>
+                </div>
+                <div class="summary-total-payment">
+                    <span class="label">Total Amount:</span>
+                    <span class="value" id="summaryTotalAmount">₹0.00</span>
+                </div>
+            </section>
+
+            <section class="payment-form-card">
+                <h3><i class="fas fa-credit-card"></i>Payment Details</h3>
+                <div id="paymentPageMessage" class="message-area" style="display: none;"></div>
+
+                <form id="mainPaymentForm">
+                    <input type="hidden" id="selectedPaymentMethodType" value="Card">
+                    <input type="hidden" id="finalAmountToPay" value="0">
+                    <input type="hidden" id="activeDiscountId" value="">
+
+                    <div class="discount-code-section">
+                        <h4><i class="fas fa-tag icon-left"></i>Have a Discount Code?</h4>
+                        <div class="discount-input-group">
+                            <input type="text" id="discountCodeInput" class="form-control" placeholder="Enter discount code">
+                            <button type="button" id="applyDiscountBtn" class="btn btn-outline">Apply</button>
+                        </div>
+                        <div id="discountMessage" class="message-area" style="display: none;"></div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: calc(var(--spacing-unit) * 3);">
+                        <label for="confirmationEmail"><i class="fas fa-envelope icon-form"></i>Confirmation Email</label>
+                        <input type="email" id="confirmationEmail" name="confirmationEmail" class="form-control" placeholder="your.email@example.com" required>
+                        <small class="form-text text-muted" style="font-size: var(--font-size-sm); color: var(--color-text-tertiary); margin-top: var(--spacing-unit);">
+                            Your e-ticket will be sent to this address.
+                        </small>
+                    </div>
+                    
+                    <div class="payment-method-tabs" style="margin-top: calc(var(--spacing-unit) * 2);">
+                        <button type="button" class="payment-method-tab active" data-method="Card">
+                            <i class="fas fa-credit-card"></i> Card
+                        </button>
+                        <button type="button" class="payment-method-tab" data-method="UPI">
+                            <i class="fas fa-qrcode"></i> UPI
+                        </button>
+                    </div>
+
+                    <div id="cardPaymentSection" class="payment-details-section active">
+                        <div class="form-group">
+                            <label for="cardNumber">Card Number</label>
+                            <input type="text" id="cardNumber" name="cardNumber" class="form-control" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cardName">Name on Card</label>
+                            <input type="text" id="cardName" name="cardName" class="form-control" placeholder="Full Name" required>
+                        </div>
+                        <div class="form-row-payment">
+                            <div class="form-group">
+                                <label for="expiryDate">Expiry Date (MM/YY)</label>
+                                <input type="text" id="expiryDate" name="expiryDate" class="form-control" placeholder="MM/YY" maxlength="5" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cvv">CVV</label>
+                                <input type="password" id="cvv" name="cvv" class="form-control" placeholder="•••" maxlength="4" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="upiPaymentSection" class="payment-details-section">
+                        <div class="upi-grid">
+                            <div class="qr-code-area">
+                                <div id="qrCodeDisplay">
+                                    <p class="qr-message" id="qrPlaceholderText">Scan QR or enter UPI ID</p>
+                                </div>
+                                <p id="qrStatusMessage" class="qr-message"></p>
+                            </div>
+                            <div class="upi-id-input-section">
+                                <div class="form-group">
+                                    <label for="upiId">Enter UPI ID</label>
+                                    <input type="text" id="upiId" name="upiId" class="form-control" placeholder="yourname@bank">
+                                </div>
+                                <button type="button" id="generateQrForUpiId" class="btn btn-outline btn-small btn-block">Generate QR for this ID</button>
+                            </div>
+                        </div>
+                         <p class="text-center" style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-top: var(--spacing-unit);">
+                            After payment, booking will be confirmed automatically.
+                        </p>
+                    </div>
+
+                    <button type="submit" id="confirmPaymentBtn" class="btn btn-primary btn-block pay-securely-btn">
+                        <i class="fas fa-lock icon-left"></i>Pay Securely & Book
+                    </button>
+                    <div id="paymentProcessingLoader" class="loading-indicator" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i> Processing Payment...
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <footer class="app-footer minimal-footer">
+        <p>&copy; <span id="currentYear"></span> CineVerse. Secure & Encrypted Payments.</p>
+    </footer>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/payment.js"></script>
+    <script src="/js/theme-switcher.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | CineVerse</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Styles from your existing user-dashboard.html, ensure they are compatible or move to style.css */
+        /* These styles are assumed to be mostly in your /css/style.css based on previous interactions */
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(rgba(13, 17, 23, 0.8), rgba(13, 17, 23, 0.95)), 
+                        url('/images/placeholder-hero-bg.jpg') no-repeat center center/cover; /* Ensure placeholder-hero-bg.jpg exists */
+            padding: calc(var(--spacing-unit) * 6) calc(var(--spacing-unit) * 3); /* Adjusted padding */
+            border-radius: var(--border-radius-lg);
+            text-align: center;
+            margin-bottom: calc(var(--spacing-unit) * 4); /* Adjusted margin */
+            box-shadow: var(--shadow-lg);
+        }
+        .hero-section h1 {
+            font-size: calc(var(--font-size-h1) * 1.1); /* Slightly adjusted hero H1 */
+            font-weight: 800; /* Ensure this is defined or use a number */
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-unit);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .hero-section p {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-secondary);
+            margin-bottom: calc(var(--spacing-unit) * 3);
+            max-width: 650px; /* Adjusted max-width */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .search-bar-container {
+            display: flex;
+            max-width: 550px; /* Adjusted max-width */
+            margin: 0 auto;
+            background-color: var(--color-surface-secondary);
+            border-radius: var(--border-radius-pill);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-border-primary);
+            overflow: hidden; 
+        }
+        .search-input {
+            flex-grow: 1;
+            padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2.25); /* Adjusted padding */
+            border: none;
+            background-color: transparent;
+            color: var(--color-text-primary);
+            font-size: var(--font-size-md);
+        }
+        .search-input::placeholder { color: var(--color-text-tertiary); }
+        .search-input:focus { outline: none; }
+
+        .search-button {
+            padding: 0 calc(var(--spacing-unit) * 2.5); /* Adjusted padding */
+            background-color: var(--color-accent-primary);
+            color: var(--color-text-on-accent);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition-colors);
+            font-size: 1rem; /* Adjusted font size */
+        }
+        .search-button:hover { background-color: var(--color-accent-primary-hover); }
+
+        /* Movies Section */
+        .movies-section .section-header { /* Applied to both "Popular Now" and "Now Showing" */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: calc(var(--spacing-unit) * 2.5); 
+            padding-bottom: var(--spacing-unit);
+            border-bottom: 1px solid var(--color-border-divider);
+        }
+        .movies-section .section-header h2 {
+            font-size: var(--font-size-h2);
+            margin-bottom: 0;
+        }
+        .filter-controls select { 
+            background-color: var(--color-surface-secondary);
+            color: var(--color-text-primary);
+            padding: calc(var(--spacing-unit) * 1) calc(var(--spacing-unit) * 1.5);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-sm);
+        }
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+            gap: calc(var(--spacing-unit) * 2.5); 
+        }
+
+        .movie-card {
+            background-color: var(--color-surface-primary);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-main);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid transparent; 
+        }
+        .movie-card:hover {
+            transform: translateY(-5px) scale(1.02); 
+            box-shadow: 0 6px 20px -4px var(--color-accent-primary-glow), var(--shadow-lg);
+            border-color: var(--color-accent-primary);
+        }
+
+        .movie-poster-link { display: block; text-decoration: none; }
+        .movie-poster {
+            position: relative;
+            width: 100%;
+            padding-top: 150%; 
+            background-color: var(--color-surface-secondary); 
+            background-size: cover;
+            background-position: center;
+            border-bottom: 1px solid var(--color-border-divider);
+        }
+        .movie-overlay-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: calc(var(--spacing-unit) * 1.5); 
+            background: linear-gradient(to top, rgba(var(--color-background-primary-rgb, 13, 17, 23), 0.95) 10%, rgba(var(--color-background-primary-rgb, 13, 17, 23), 0) 100%);
+            color: var(--color-text-primary);
+            font-size: var(--font-size-sm);
+            text-align: left;
+        }
+        .movie-rating { 
+            font-weight: 600; 
+            display: flex; 
+            align-items: center;
+            gap: calc(var(--spacing-unit) * 0.5);
+            line-height: 1; 
+        }
+        .movie-rating .stars-display { 
+            display: inline-flex; 
+            align-items: center;
+        }
+        .movie-rating .stars-display i { 
+            color: var(--color-warning); 
+            font-size: 0.9em; 
+            margin-right: 2px; 
+        }
+        .movie-rating .rating-text-display { 
+             color: var(--color-text-primary);
+             margin-left: calc(var(--spacing-unit) * 0.25); 
+             font-weight: 700;
+        }
+         .review-count-dashboard { 
+            font-size: 0.8em;
+            color: var(--color-text-secondary);
+            margin-left: calc(var(--spacing-unit) * 0.5);
+        }
+
+        .movie-content {
+            padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2); 
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1; 
+        }
+        .movie-title-card {
+            font-size: var(--font-size-lg); 
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: calc(var(--spacing-unit) * 0.5);
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: calc(1.3em * 2); 
+        }
+        .movie-genre-card {
+            font-size: calc(var(--font-size-sm) * 0.9); 
+            color: var(--color-accent-primary);
+            margin-bottom: var(--spacing-unit);
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .movie-details-link {
+            margin-top: auto; 
+            width: 100%; 
+        }
+    </style>
+</head>
+<body class="page-user-dashboard">
+
+    <header class="app-header">
+        <div class="header-content">
+            <a href="/user-dashboard.html" class="header-logo">
+                <i class="fas fa-film"></i>
+                <span>CineVerse</span>
+            </a>
+            <nav class="header-nav">
+                <a href="/user-dashboard.html" class="nav-link active">Movies</a>
+                <a href="/my-bookings.html" class="nav-link">My Bookings</a>
+            </nav>
+            <div class="user-profile">
+                <button id="themeSwitcher" class="theme-switcher" title="Toggle theme">
+                    <i class="fas fa-sun theme-switcher-icon"></i>
+                    <i class="fas fa-moon theme-switcher-icon"></i>
+                </button>
+                <span id="userWelcomeText" class="welcome-text">Welcome!</span>
+                <button class="btn btn-icon btn-logout" id="logoutButton" aria-label="Logout" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <section class="hero-section">
+            <h1>Discover Your Next Movie Adventure</h1>
+            <p>Explore the latest blockbusters and timeless classics, all in one place.</p>
+            <div class="search-bar-container">
+                <input type="search" id="movieSearchInput" placeholder="Search movies by title..." class="search-input">
+                <button id="movieSearchButton" class="search-button" aria-label="Search">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </section>
+
+        <section class="movies-section" id="popular-movies-section">
+            <div class="section-header">
+                <h2>Popular Now</h2>
+            </div>
+            <div id="popularMovieGridMessage" class="message-area" style="display: none;"></div>
+            <div id="popularMovieGridContainer" class="movie-grid">
+                </div>
+            <div id="loadingPopularMoviesIndicator" class="loading-indicator" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i> Loading popular movies...
+            </div>
+        </section>
+        
+        <section class="movies-section" id="now-showing-movies-section">
+            <div class="section-header">
+                <h2>Now Showing</h2>
+                <div class="filter-controls">
+                    <select id="genreFilterSelect" class="form-control" aria-label="Filter by genre">
+                        <option value="all">All Genres</option>
+                        </select>
+                </div>
+            </div>
+            <div id="movieGridMessage" class="message-area" style="display: none;"></div> <div id="movieGridContainer" class="movie-grid">
+                </div>
+            <div id="loadingMoviesIndicator" class="loading-indicator" style="display: none;"> <i class="fas fa-spinner fa-spin"></i> Loading movies...
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>&copy; <span id="currentYear"></span> CineVerse. All rights reserved. Experience the magic of cinema.</p>
+    </footer>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/user-dashboard.js"></script>
+    <script src="/js/theme-switcher.js" defer></script>
+</body>
+</html>

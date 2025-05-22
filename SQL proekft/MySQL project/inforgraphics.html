@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Booking System: Industry Insights & AI Future</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F0F0F0; /* Light grey background */
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem; /* 12px */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem; /* 24px */
+            margin-bottom: 1.5rem; /* 24px */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Default max-width */
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; /* Base height */
+            max-height: 400px; /* Max height */
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .stat-number {
+            font-weight: 900; /* Extra bold */
+            font-size: 3rem; /* 48px */
+            line-height: 1;
+            color: #118AB2; /* Strong Blue from palette */
+        }
+        .flowchart-node {
+            border: 2px solid #06D6A0; /* Lively Green/Teal */
+            color: #073B4C; /* Deep Teal/Dark Blue for text */
+            background-color: #FFFFFF;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+        }
+        .flowchart-arrow {
+            font-size: 2rem;
+            color: #FF6B6B; /* Vibrant Red/Coral */
+            margin: 0 0.5rem;
+            align-self: center;
+        }
+        .swot-item {
+            border-left: 4px solid;
+            padding-left: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        .swot-strength { border-color: #06D6A0; } /* Green */
+        .swot-weakness { border-color: #FF6B6B; } /* Red */
+        .swot-opportunity { border-color: #FFD166; } /* Yellow */
+        .swot-threat { border-color: #118AB2; } /* Blue */
+
+        .section-title {
+            font-size: 2.25rem; /* 36px */
+            font-weight: 700;
+            color: #073B4C; /* Deep Teal/Dark Blue */
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #FFD166; /* Bright Yellow */
+        }
+         .section-intro-text {
+            font-size: 1.125rem; /* 18px */
+            line-height: 1.75; /* 28px */
+            color: #4A5568; /* Tailwind gray-700 */
+            margin-bottom: 1.5rem;
+        }
+        .chart-title {
+            font-size: 1.25rem; /* 20px */
+            font-weight: 600;
+            color: #073B4C;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .chart-explanation {
+            font-size: 0.95rem; /* 15px */
+            color: #4A5568;
+            margin-top: 1rem;
+            text-align: center;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .unicode-icon {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+        .kpi-card {
+            background-color: #118AB2; /* Strong Blue */
+            color: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .kpi-label {
+            font-size: 1rem;
+            margin-top: 0.25rem;
+        }
+        .gemini-feature-card {
+            background-color: #E0F7FA; /* Light Cyan - from palette shades */
+            border-left: 5px solid #118AB2; /* Strong Blue Accent */
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.375rem; /* 6px */
+        }
+        .gemini-feature-title {
+            font-size: 1.25rem; /* 20px */
+            font-weight: 600;
+            color: #073B4C; /* Deep Teal */
+            margin-bottom: 0.5rem;
+        }
+        .gemini-feature-description {
+            font-size: 1rem; /* 16px */
+            color: #374151; /* Tailwind gray-700 */
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <!-- 
+        Infographic Narrative Plan:
+        Section 1: The Digital Shift in Entertainment (Introduction/Hook)
+        Section 2: Technology Stack & Architecture (Core System Blueprint)
+        Section 3: Core System Capabilities (User & Admin Power)
+        Section 4: Data: The Foundation (ER Model Insights)
+        Section 5: Ensuring Quality & Performance (NFRs & System Strengths)
+        Section 6: System Modules - Building Blocks (Modular Design)
+        Section 7: Future Forward: AI-Powered Enhancements with Gemini (New Section)
+        Confirmation: NEITHER Mermaid JS NOR SVG were used anywhere in this output.
+    -->
+    <!-- 
+        Visualization Plan Summary:
+        Section 1: Single Big Number (HTML/Tailwind, NO SVG)
+        Section 2: Structured HTML/CSS Flow Chart (HTML/Tailwind, NO SVG, NO MERMAID JS); Icon Chart (Unicode, HTML/Tailwind, NO SVG)
+        Section 3: Bar Chart (Chart.js Canvas, NO SVG); Text callout (HTML/Tailwind)
+        Section 4: Donut Chart (Chart.js Canvas, NO SVG); Text callout/mini-flow (HTML/Tailwind, NO SVG, NO MERMAID JS)
+        Section 5: Radar Chart (Chart.js Canvas, NO SVG)
+        Section 6: Single Big Number / Styled List (HTML/Tailwind, NO SVG)
+        Section 7: Styled Text Blocks with Unicode Icons (HTML/Tailwind, NO SVG) - New Section
+        Confirmation: NEITHER Mermaid JS NOR SVG were used anywhere in this output.
+    -->
+
+    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4" style="color: #073B4C;">Movie Booking & Screening Simulator</h1>
+            <p class="text-xl text-gray-600">An In-depth Look at its Design, Technology, and AI-Enhanced Future</p>
+        </header>
+
+        <section id="digital-shift" class="card">
+            <h2 class="section-title">The Digital Shift in Entertainment</h2>
+            <p class="section-intro-text">
+                The entertainment landscape is rapidly evolving, with online services becoming central to how users engage with content. Digital movie ticket booking platforms are no longer a novelty but an essential convenience, streamlining access to cinematic experiences. This simulator project mirrors this trend, providing a comprehensive digital solution.
+            </p>
+            <div class="text-center py-8">
+                <p class="text-lg text-gray-700 mb-2">Online booking platforms handle a significant majority of ticket sales:</p>
+                <div class="stat-number">90%+</div>
+                <p class="text-md text-gray-600">(Illustrative industry trend)</p>
+                <p class="chart-explanation">
+                    This statistic underscores the importance of robust, user-friendly online booking systems. The Movie Booking Simulator is designed to emulate such a system, offering insights into their architecture and functionality.
+                </p>
+            </div>
+        </section>
+
+        <section id="tech-stack" class="card">
+            <h2 class="section-title">Core System Blueprint: Technology & Architecture</h2>
+            <p class="section-intro-text">
+                The simulator is built on a modern, pragmatic technology stack, chosen for its efficiency and reliability. It employs a classic three-tier architecture, ensuring a clear separation of concerns and facilitating scalability and maintainability.
+            </p>
+            <div class="mb-8">
+                <h3 class="chart-title">System Architecture Flow</h3>
+                <div class="flex flex-col md:flex-row justify-around items-center p-4 space-y-4 md:space-y-0 md:space-x-4">
+                    <div class="flowchart-node">Frontend<br>(HTML, CSS, JS)</div>
+                    <div class="flowchart-arrow text-3xl font-bold transform md:rotate-0 rotate-90">&rarr;</div>
+                    <div class="flowchart-node">Backend<br>(Node.js, Express.js)</div>
+                    <div class="flowchart-arrow text-3xl font-bold transform md:rotate-0 rotate-90">&rarr;</div>
+                    <div class="flowchart-node">Database<br>(MySQL)</div>
+                </div>
+                <p class="chart-explanation">
+                    This three-tier architecture separates presentation (Frontend), business logic (Backend), and data storage (Database). User interactions on the frontend trigger requests to the backend, which processes them and interacts with the MySQL database to retrieve or store information.
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                <div class="p-6 rounded-lg" style="background-color: #E0F7FA;">
+                    <h4 class="text-xl font-semibold mb-2" style="color: #073B4C;">Key Backend Technology: Node.js</h4>
+                    <p class="text-gray-700"><span class="unicode-icon" style="color: #FFD166;">⚡️</span> Node.js's event-driven, non-blocking I/O model is ideal for handling numerous concurrent user requests efficiently, crucial for a responsive booking system.</p>
+                </div>
+                <div class="p-6 rounded-lg" style="background-color: #FFF9C4;">
+                    <h4 class="text-xl font-semibold mb-2" style="color: #073B4C;">Database Management: MySQL</h4>
+                    <p class="text-gray-700"><span class="unicode-icon" style="color: #06D6A0;">🗃️</span> MySQL, a relational database, ensures data integrity and supports complex queries, vital for managing bookings, user data, and movie information with ACID compliance.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="capabilities" class="card">
+            <h2 class="section-title">Powering the Experience: User & Admin Capabilities</h2>
+            <p class="section-intro-text">
+                The simulator offers a rich set of features for both moviegoers and administrators, aiming to provide a seamless and comprehensive experience. From browsing movies to managing the entire backend, the system is designed for robust functionality.
+            </p>
+            <div>
+                <h3 class="chart-title">Functional Requirements Overview</h3>
+                <div class="chart-container mx-auto h-[400px] md:h-[450px]">
+                    <canvas id="functionalRequirementsChart"></canvas>
+                </div>
+                <p class="chart-explanation">
+                    The system provides a balanced set of functionalities. Users can register, log in, browse movies, search, view showtimes, select seats, book tickets, and view their booking history. Administrators have a secure login, a dashboard, and full CRUD (Create, Read, Update, Delete) capabilities for movies, theatres, screens, and showtimes, along with booking management.
+                </p>
+            </div>
+            <div class="mt-8 p-6 rounded-lg" style="background-color: #FFEBEE;">
+                <h4 class="text-xl font-semibold mb-2" style="color: #073B4C;">Spotlight Feature: Interactive Seat Selection</h4>
+                <p class="text-gray-700"><span class="unicode-icon" style="color: #118AB2;">🪑</span> A key complex feature is the visual seat selection map. This requires sophisticated backend logic for real-time seat status tracking (available, booked, reserved) and a dynamic frontend to render the layout and capture user choices accurately.</p>
+            </div>
+        </section>
+
+        <section id="data-model" class="card">
+            <h2 class="section-title">The Backbone: Data Modeling & Management</h2>
+            <p class="section-intro-text">
+                A well-structured database is the heart of the simulator. Using MySQL Workbench, an Entity-Relationship (ER) model defines key entities and their relationships, ensuring data integrity, minimizing redundancy, and enabling efficient data operations.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h3 class="chart-title">Core Database Entities</h3>
+                    <div class="chart-container mx-auto h-[350px] md:h-[400px]">
+                        <canvas id="erModelChart"></canvas>
+                    </div>
+                    <p class="chart-explanation">
+                        The database revolves around key entities like Users, Movies, Theatres, Screens, Showtimes, and Bookings. This donut chart illustrates the distribution of these primary components within the data model, each playing a vital role in the system's operation.
+                    </p>
+                </div>
+                <div class="p-6 rounded-lg" style="background-color: #F1F8E9;">
+                    <h4 class="text-xl font-semibold mb-2" style="color: #073B4C;">Critical Component: `BookingSeats` Table</h4>
+                    <p class="text-gray-700 mb-3">The `BookingSeats` junction table is fundamental for managing seat reservations accurately. It links specific seats to a booking for a particular showtime.</p>
+                    <div class="flex flex-col space-y-2 items-center">
+                        <div class="flowchart-node text-sm">Booking Record</div>
+                        <div class="flowchart-arrow text-xl transform rotate-90">&darr;</div>
+                        <div class="flowchart-node text-sm bg-yellow-100 border-yellow-400">BookingSeats<br>(SeatID + ShowtimeID = Unique)</div>
+                        <div class="flowchart-arrow text-xl transform rotate-90">&darr;</div>
+                        <div class="flowchart-node text-sm">Physical Seat</div>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-3 text-center">This structure prevents double-bookings for the same seat at the same showtime, ensuring data integrity.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="quality-performance" class="card">
+            <h2 class="section-title">Built for Excellence: Quality & Performance</h2>
+            <p class="section-intro-text">
+                Beyond core functions, the simulator emphasizes non-functional requirements (NFRs) that define its quality. These include performance, reliability, security, and usability, all crucial for a positive user experience and system trustworthiness.
+            </p>
+            <div class="mb-8">
+                <h3 class="chart-title">Key Non-Functional Requirements Focus</h3>
+                <div class="chart-container mx-auto h-[400px] md:h-[450px]">
+                    <canvas id="nfrChart"></canvas>
+                </div>
+                <p class="chart-explanation">
+                    The system targets key quality attributes: high Performance (e.g., fast page loads & API responses), strong Reliability (uptime & data integrity through ACID compliance), robust Security (secure authentication, RBAC, protection against common vulnerabilities), and excellent Usability for both users and admins.
+                </p>
+            </div>
+             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+                <div class="kpi-card" style="background-color: #06D6A0;"> <div class="kpi-value">&lt;3s</div>
+                    <div class="kpi-label">Page Load Time</div>
+                </div>
+                <div class="kpi-card" style="background-color: #FFD166;"> <div class="kpi-value">99%</div>
+                    <div class="kpi-label">Target Uptime</div>
+                </div>
+                <div class="kpi-card" style="background-color: #FF6B6B;"> <div class="kpi-value">100%</div>
+                    <div class="kpi-label">Booking Integrity</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="system-modules" class="card">
+            <h2 class="section-title">The Sum of Its Parts: System Modules</h2>
+            <p class="section-intro-text">
+                The simulator is developed with a modular design philosophy, breaking down the system into manageable, independent components. This enhances organization, simplifies development and testing, and improves long-term maintainability.
+            </p>
+            <div class="text-center py-8">
+                 <p class="text-lg text-gray-700 mb-2">The system is composed of several distinct functional modules:</p>
+                <div class="stat-number" style="color: #06D6A0;">9+</div>
+                <p class="text-md text-gray-600">Core Modules</p>
+            </div>
+            <div class="mt-6">
+                <h4 class="text-xl font-semibold mb-3 text-center" style="color: #073B4C;">Key Modules Include:</h4>
+                <ul class="list-disc list-inside grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-2 text-gray-700 max-w-3xl mx-auto">
+                    <li>User Authentication</li>
+                    <li>Movie Management (Admin)</li>
+                    <li>Theatre & Screen Mgt. (Admin)</li>
+                    <li>Showtime Management (Admin)</li>
+                    <li>Movie Browsing (User)</li>
+                    <li>Booking Processing (User)</li>
+                    <li>User Dashboard (User)</li>
+                    <li>Admin Dashboard</li>
+                    <li>Frontend UI</li>
+                </ul>
+                <p class="chart-explanation">
+                    This modular approach allows for focused development and testing of each part of the system, such as user authentication, movie management, and the critical booking processing workflow, contributing to overall system robustness.
+                </p>
+            </div>
+        </section>
+
+        <section id="gemini-features" class="card">
+            <h2 class="section-title">✨ Future Forward: AI-Powered Enhancements with Gemini</h2>
+            <p class="section-intro-text">
+                The Movie Booking Simulator can be further elevated by integrating cutting-edge AI capabilities through the Gemini API. These features would enhance user experience, streamline administrative tasks, and provide deeper insights.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="gemini-feature-card">
+                    <h3 class="gemini-feature-title"><span class="unicode-icon">💡</span> Personalized Movie Recommendations</h3>
+                    <p class="gemini-feature-description">
+                        Leverage Gemini to analyze user preferences, booking history, and even natural language queries (e.g., "Suggest a funny movie for the family this weekend"). This offers truly tailored movie suggestions, increasing engagement and discovery.
+                    </p>
+                </div>
+                <div class="gemini-feature-card">
+                    <h3 class="gemini-feature-title"><span class="unicode-icon">✍️</span> AI-Generated Movie Synopses</h3>
+                    <p class="gemini-feature-description">
+                        Admins can input basic movie details (title, genre, lead actors), and Gemini can draft compelling, engaging, and SEO-friendly synopses. This saves time and ensures high-quality, consistent content across the platform.
+                    </p>
+                </div>
+                <div class="gemini-feature-card">
+                    <h3 class="gemini-feature-title"><span class="unicode-icon">📊</span> Intelligent Review Summarizer</h3>
+                    <p class="gemini-feature-description">
+                        Instead of users sifting through countless reviews, Gemini can process them to generate concise summaries of overall sentiment, highlighting common praises, criticisms, and key aspects mentioned by viewers.
+                    </p>
+                </div>
+                <div class="gemini-feature-card">
+                    <h3 class="gemini-feature-title"><span class="unicode-icon">🍿</span> "Plan My Movie Night" Assistant</h3>
+                    <p class="gemini-feature-description">
+                        Users describe their ideal movie outing (e.g., "action movie, Friday night, downtown, good for a group of friends, near a pizza place"). Gemini helps find suitable movies, showtimes, and can even suggest nearby amenities or restaurants.
+                    </p>
+                </div>
+            </div>
+            <p class="mt-6 text-center text-md text-gray-600">
+                Integrating these Gemini-powered features would transform the simulator into a smarter, more intuitive, and highly personalized movie booking experience.
+            </p>
+        </section>
+
+
+        <footer class="text-center mt-12 py-8 border-t border-gray-300">
+            <p class="text-gray-600">&copy; 2024 Movie Booking Simulator Insights. All data derived from project documentation. AI feature concepts powered by Gemini.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Helper function to wrap long labels for Chart.js
+        function wrapLabels(label, maxWidth) {
+            if (typeof label !== 'string') return label; // Return as is if not a string (e.g., already an array)
+            const words = label.split(' ');
+            let currentLine = '';
+            const lines = [];
+            words.forEach(word => {
+                if ((currentLine + ' ' + word).trim().length > maxWidth && currentLine.length > 0) {
+                    lines.push(currentLine.trim());
+                    currentLine = word;
+                } else {
+                    currentLine = (currentLine + ' ' + word).trim();
+                }
+            });
+            if (currentLine.length > 0) {
+                lines.push(currentLine.trim());
+            }
+            return lines.length > 0 ? lines : [label]; // Return original label if it couldn't be split
+        }
+
+        const defaultTooltipCallbacks = {
+            title: function(tooltipItems) {
+                const item = tooltipItems[0];
+                if (!item) return '';
+                let label = item.chart.data.labels[item.dataIndex];
+                if (Array.isArray(label)) {
+                    return label.join(' ');
+                } else {
+                    return label;
+                }
+            }
+        };
+
+        // Chart 1: Functional Requirements Chart (Bar Chart)
+        const frCtx = document.getElementById('functionalRequirementsChart').getContext('2d');
+        new Chart(frCtx, {
+            type: 'bar',
+            data: {
+                labels: [
+                    wrapLabels('User Account Management', 16), 
+                    wrapLabels('Movie Browsing & Search', 16), 
+                    wrapLabels('Showtime & Seat Selection', 16), 
+                    wrapLabels('Ticket Booking & History', 16),
+                    wrapLabels('Admin Content Management (Movies, Theatres, Screens)', 20), 
+                    wrapLabels('Admin Showtime & Booking Mgt.', 16)
+                ],
+                datasets: [{
+                    label: 'Key Functional Areas',
+                    data: [4, 5, 6, 4, 7, 5], 
+                    backgroundColor: ['#FF6B6B', '#FFD166', '#06D6A0', '#118AB2', '#FF8C42', '#7F58AF'], 
+                    borderColor: '#FFFFFF',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y', 
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: { color: '#073B4C' },
+                        grid: { display: false }
+                    },
+                    y: {
+                        ticks: { color: '#073B4C', autoSkip: false }, 
+                         grid: { color: '#E0E0E0' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#073B4C',
+                        titleColor: '#FFFFFF',
+                        bodyColor: '#FFFFFF',
+                        callbacks: defaultTooltipCallbacks
+                    }
+                }
+            }
+        });
+
+        // Chart 2: ER Model Chart (Donut Chart)
+        const erCtx = document.getElementById('erModelChart').getContext('2d');
+        new Chart(erCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    wrapLabels('Users', 16), 
+                    wrapLabels('Movies', 16), 
+                    wrapLabels('Theatres & Screens', 16), 
+                    wrapLabels('Showtimes', 16), 
+                    wrapLabels('Bookings & Seats', 16)
+                ],
+                datasets: [{
+                    label: 'Core Entities',
+                    data: [15, 20, 15, 25, 25], 
+                    backgroundColor: ['#FF6B6B', '#FFD166', '#06D6A0', '#118AB2', '#073B4C'],
+                    borderColor: '#FFFFFF',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { 
+                        position: 'bottom', 
+                        labels: { color: '#073B4C', padding:10 } 
+                    },
+                    tooltip: {
+                        backgroundColor: '#073B4C',
+                        callbacks: defaultTooltipCallbacks
+                    }
+                }
+            }
+        });
+
+        // Chart 3: NFR Chart (Radar Chart)
+        const nfrCtx = document.getElementById('nfrChart').getContext('2d');
+        new Chart(nfrCtx, {
+            type: 'radar',
+            data: {
+                labels: [
+                    wrapLabels('Performance', 16), 
+                    wrapLabels('Reliability (ACID)', 16), 
+                    wrapLabels('Security (Auth/AuthZ)', 16), 
+                    wrapLabels('Usability', 16), 
+                    wrapLabels('Scalability (Users)', 16),
+                    wrapLabels('Maintainability', 16)
+                ],
+                datasets: [{
+                    label: 'System Quality Focus',
+                    data: [90, 95, 85, 80, 75, 70], 
+                    backgroundColor: 'rgba(6, 214, 160, 0.2)', 
+                    borderColor: '#06D6A0',
+                    pointBackgroundColor: '#06D6A0',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#06D6A0',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: '#B0BEC5' },
+                        grid: { color: '#CFD8DC' },
+                        pointLabels: { 
+                            font: { size: 11 }, 
+                            color: '#073B4C' 
+                        },
+                        ticks: { 
+                            backdropColor: 'transparent', 
+                            color: '#073B4C',
+                            stepSize: 20
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 100
+                    }
+                },
+                plugins: {
+                    legend: { 
+                        display: false,
+                        labels: { color: '#073B4C' } 
+                    },
+                    tooltip: {
+                        backgroundColor: '#073B4C',
+                        callbacks: defaultTooltipCallbacks
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

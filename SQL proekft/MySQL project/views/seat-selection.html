@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Your Seats | CineVerse</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .page-seat-selection .app-header { /* Ensure header is distinct if needed */
+            border-bottom: 1px solid var(--color-border-divider);
+        }
+
+        .seat-selection-main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center content like screen and seats */
+            gap: calc(var(--spacing-unit) * 3); /* 24px */
+            perspective: 1000px; /* Add perspective for 3D effects */
+        }
+
+        .showtime-info-bar {
+            background-color: var(--color-surface-primary);
+            padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
+            border-radius: var(--border-radius-md);
+            text-align: center;
+            width: 100%;
+            max-width: 800px; /* Limit width of this bar */
+            margin-bottom: calc(var(--spacing-unit) * 2);
+            box-shadow: var(--shadow-sm);
+        }
+        .showtime-info-bar h2 {
+            font-size: var(--font-size-xl);
+            color: var(--color-text-primary);
+            margin-bottom: calc(var(--spacing-unit) * 0.5);
+        }
+        .showtime-info-bar p {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+            margin: 0;
+        }
+
+        .seating-area {
+            width: 100%;
+            max-width: 800px; /* Increased max width for a grander feel */
+            background: linear-gradient(to bottom, var(--color-surface-primary), var(--color-background-secondary)); /* Subtle gradient */
+            padding: calc(var(--spacing-unit) * 4); /* Increased padding */
+            border-radius: var(--border-radius-xl); /* More rounded */
+            box-shadow: var(--shadow-lg), 0 0 50px rgba(34, 211, 238, 0.1); /* Enhanced shadow */
+            border: 1px solid var(--color-border-divider);
+            transform: rotateX(5deg); /* Slight tilt for 3D effect */
+            margin-bottom: calc(var(--spacing-unit) * 4);
+        }
+
+        .screen-representation-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            perspective: 500px; /* Perspective for the screen itself */
+            margin-bottom: calc(var(--spacing-unit) * 5); /* More space below screen */
+        }
+        .screen-representation {
+            width: 90%; /* Wider screen */
+            max-width: 600px;
+            margin: 0 auto calc(var(--spacing-unit) * 4) auto;
+            padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2); /* Slightly more padding */
+            background: linear-gradient(to bottom, #1A1C2A, #0F111A); /* Darker, more cinematic gradient */
+            color: var(--color-text-secondary);
+            text-align: center;
+            font-weight: 700; /* Bolder text */
+            letter-spacing: 4px; /* Wider spacing for "SCREEN" */
+            font-size: var(--font-size-md); /* Larger font */
+            border-radius: 10px 10px 80px 80px / 10px 10px 30px 30px; /* More pronounced curve */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px var(--color-accent-primary-glow); /* Deeper shadow + glow */
+            text-transform: uppercase;
+            transform: rotateX(-15deg) scale(1.05); /* 3D tilt and slight scale */
+            border-bottom: 3px solid var(--color-accent-primary);
+            position: relative;
+        }
+        .screen-representation::before { /* Screen reflection/glare */
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 10%;
+            right: 10%;
+            height: 5px;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+            border-radius: 5px;
+        }
+
+
+        .seats-grid {
+            display: grid;
+            gap: calc(var(--spacing-unit) * 1) calc(var(--spacing-unit) * 0.75); /* Slightly more row gap */
+            justify-content: center;
+            margin-bottom: calc(var(--spacing-unit) * 3);
+        }
+
+        .seat {
+            width: 36px; /* Slightly larger seats */
+            height: 32px; /* Rectangular for a more "seat" like proportion */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px 8px 3px 3px; /* Rounded top, flatter bottom */
+            cursor: pointer;
+            transition: var(--transition-colors), transform var(--transition-duration-fast) var(--transition-timing-function), box-shadow var(--transition-duration-fast) var(--transition-timing-function);
+            font-weight: 600;
+            font-size: calc(var(--font-size-sm) * 0.85); /* Smaller text on seat */
+            border: 1px solid var(--color-border-primary);
+            background-color: var(--color-surface-secondary);
+            color: var(--color-text-secondary);
+            user-select: none;
+            position: relative; /* For pseudo-elements if needed */
+            box-shadow: var(--shadow-xs), inset 0 -2px 2px rgba(0,0,0,0.1); /* Subtle depth */
+        }
+        .seat::before { /* Seat back representation */
+            content: '';
+            position: absolute;
+            top: -3px; /* Positioned above the seat base */
+            left: 2px;
+            right: 2px;
+            height: 5px; /* Height of the seat back */
+            background-color: rgba(255,255,255,0.05); /* Slightly lighter top */
+            border-radius: 5px 5px 0 0;
+            border: 1px solid var(--color-border-primary);
+            border-bottom: none;
+        }
+
+        .seat.available:hover {
+            background-color: var(--color-accent-tertiary);
+            color: var(--color-text-primary);
+            transform: scale(1.15) translateY(-2px); /* More pronounced hover effect */
+            border-color: var(--color-accent-tertiary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2), 0 0 15px var(--color-accent-primary-glow);
+        }
+        .seat.selected {
+            background-color: var(--color-accent-primary);
+            color: var(--color-text-on-accent);
+            border-color: var(--color-accent-primary-hover);
+            transform: scale(1.1) translateY(-1px);
+            box-shadow: 0 0 15px var(--color-accent-primary-glow), 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .seat.occupied {
+            background-color: #3A3D4A; /* Darker, distinct gray for occupied */
+            color: var(--color-background-secondary);
+            cursor: not-allowed;
+            opacity: 0.6;
+            border-color: #2A2C38;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .seat.occupied::before{
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        /* Styling for specific seat types */
+        .seat.Premium::before {
+             border-top: 2px solid var(--color-warning); /* Gold top border for Premium */
+        }
+        .seat.VIP::before {
+            border-top: 2px solid var(--color-accent-secondary); /* Pink top border for VIP */
+        }
+        /* Hide default after content text, as seat type is now indicated by border or other means */
+        .seat.Premium::after, .seat.VIP::after { content: none; }
+
+
+        .aisle-spacer {
+            background-color: rgba(0,0,0,0.1); /* Subtle indication of aisle */
+            border-radius: var(--border-radius-sm);
+            position: relative; /* For text or icons */
+            min-height: 32px; /* Match seat height */
+        }
+        /* Add "EXIT" text to main aisles - assumes AISLE_AFTER_SEAT_NUMBERS = [2, 6]
+           This is a bit of a hack and might need adjustment based on actual aisle configuration
+           Targets first and last aisle spacer in a visual block.
+           Needs JS to add specific classes like 'main-aisle-start' / 'main-aisle-end' for better targeting.
+           For now, let's try a general approach for demonstration.
+        */
+        .seats-grid > .aisle-spacer:nth-child(4n+3)::after, /* Rough targeting, adjust based on actual grid columns */
+        .seats-grid > .aisle-spacer:nth-child(8n+7)::after {
+            content: "EXIT";
+            position: absolute;
+            bottom: -20px; /* Position below the aisle spacer */
+            left: 50%;
+            transform: translateX(-50%) rotate(90deg);
+            font-size: 10px;
+            font-weight: bold;
+            color: var(--color-accent-secondary);
+            opacity: 0.7;
+            white-space: nowrap;
+        }
+        .row-label-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-md);
+        }
+
+        .seat-legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: calc(var(--spacing-unit) * 2.5); /* Increased gap */
+            font-size: var(--font-size-sm);
+            margin-top: calc(var(--spacing-unit) * 3); /* More space above legend */
+            color: var(--color-text-secondary);
+            background: var(--color-surface-secondary);
+            padding: var(--spacing-unit) * 2;
+            border-radius: var(--border-radius-md);
+        }
+        .legend-item { display: flex; align-items: center; }
+        .seat-example {
+            width: 24px; /* Match new seat aesthetics somewhat */
+            height: 20px;
+            border-radius: 6px 6px 2px 2px;
+            margin-right: var(--spacing-unit);
+            display: inline-block;
+            border: 1px solid var(--color-border-primary);
+            position: relative;
+        }
+         .seat-example::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 1px;
+            right: 1px;
+            height: 4px;
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 4px 4px 0 0;
+            border: 1px solid var(--color-border-primary);
+            border-bottom: none;
+        }
+        .seat-example.available { background-color: var(--color-surface-secondary); }
+        .seat-example.selected { background-color: var(--color-accent-primary); }
+        .seat-example.occupied { background-color: #3A3D4A; }
+        .seat-example.occupied::before {background-color: rgba(0,0,0,0.1);}
+
+        .seat-example.premium { background-color: var(--color-surface-secondary); }
+        .seat-example.premium::before { border-top: 2px solid var(--color-warning); }
+        .seat-example.premium::after { content: 'P'; font-size: 0.7em; position: absolute; bottom: 1px; right: 2px; color: var(--color-text-secondary); } /* Keep text for clarity */
+        /* Add VIP to legend if not already present or style if it is */
+        .seat-example.vip { background-color: var(--color-surface-secondary); }
+        .seat-example.vip::before { border-top: 2px solid var(--color-accent-secondary); }
+        .seat-example.vip::after { content: 'V'; font-size: 0.7em; position: absolute; bottom: 1px; right: 2px; color: var(--color-text-secondary); }
+
+
+        .booking-summary-panel {
+            width: 100%;
+            max-width: 800px; /* Match seating area width */
+            background-color: var(--color-surface-primary);
+            padding: calc(var(--spacing-unit) * 2.5);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            margin-top: calc(var(--spacing-unit) * 3);
+            border: 1px solid var(--color-border-divider);
+            transform: rotateX(-2deg); /* Slight counter-tilt for dynamism */
+        }
+        .booking-summary-panel h3 {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-unit);
+            padding-bottom: var(--spacing-unit);
+            border-bottom: 1px solid var(--color-border-divider);
+        }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--font-size-md);
+            margin-bottom: var(--spacing-unit);
+            color: var(--color-text-secondary);
+        }
+        .summary-item strong {
+            color: var(--color-text-primary);
+            font-weight: 600;
+        }
+        .summary-item#summarySelectedSeatsList {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .summary-item#summarySelectedSeatsList strong {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-unit);
+            margin-top: calc(var(--spacing-unit) * 0.5);
+        }
+        .summary-item#summarySelectedSeatsList .seat-tag {
+            background-color: var(--color-accent-tertiary);
+            color: var(--color-text-primary);
+            padding: calc(var(--spacing-unit)*0.5) var(--spacing-unit);
+            border-radius: var(--border-radius-pill);
+            font-size: var(--font-size-sm);
+        }
+
+        .summary-item.total {
+            font-size: var(--font-size-xl);
+            margin-top: calc(var(--spacing-unit) * 2);
+            padding-top: calc(var(--spacing-unit) * 2);
+            border-top: 1px solid var(--color-border-divider);
+        }
+        .summary-item.total strong {
+            color: var(--color-accent-primary);
+        }
+        #proceedToPaymentBtn {
+            margin-top: calc(var(--spacing-unit) * 2.5);
+        }
+
+        @media (max-width: 768px) {
+            .seat { width: 28px; height: 26px; font-size: calc(var(--font-size-sm) * 0.8); }
+            .seat::before { height: 4px; top: -2px; left: 1px; right: 1px;}
+            .seats-grid { gap: calc(var(--spacing-unit) * 0.5); }
+            .seating-area { transform: rotateX(0deg); padding: calc(var(--spacing-unit) * 2.5); } /* Flatten on mobile for usability */
+            .screen-representation { transform: rotateX(-10deg) scale(1); font-size: var(--font-size-sm); letter-spacing: 2px;}
+            .booking-summary-panel { transform: rotateX(0deg); }
+            .aisle-spacer::after { display: none; } /* Hide EXIT text on smaller screens if it's too cluttered */
+
+        }
+         @media (max-width: 480px) {
+            .seat { width: 24px; height: 22px; border-radius: 6px 6px 1px 1px;}
+            .seat::before { height: 3px; top: -1px;}
+            .screen-representation { padding: var(--spacing-unit); font-size: calc(var(--font-size-sm) * 0.9); }
+            .seat-legend { padding: var(--spacing-unit); gap: var(--spacing-unit); }
+            .legend-item { font-size: calc(var(--font-size-sm) * 0.9); }
+            .seat-example {width: 18px; height: 16px;}
+            .seat-example::before {height: 3px; top: -1px;}
+        }
+    </style>
+</head>
+<body class="page-seat-selection">
+
+    <header class="app-header">
+        <div class="header-content">
+            <a href="/user-dashboard.html" class="header-logo">
+                <i class="fas fa-film"></i>
+                <span>CineVerse</span>
+            </a>
+            <div class="user-profile">
+                <button id="themeSwitcher" class="theme-switcher" title="Toggle theme">
+                    <i class="fas fa-sun theme-switcher-icon"></i>
+                    <i class="fas fa-moon theme-switcher-icon"></i>
+                </button>
+                <span id="userWelcomeText" class="welcome-text">Welcome!</span>
+                <button class="btn btn-icon btn-logout" id="logoutButton" aria-label="Logout" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container seat-selection-main-content">
+        <div class="showtime-info-bar">
+            <h2 id="movieTitleBanner">Loading Movie...</h2>
+            <p id="showtimeDetailsBanner">Loading showtime details...</p>
+        </div>
+
+        <div class="seating-area">
+            <div class="screen-representation-container">
+                 <div class="screen-representation">SCREEN</div>
+            </div>
+            <div id="seatsMessage" class="message-area" style="display: none;"></div>
+            <div id="seatsGridContainer" class="seats-grid">
+                </div>
+            <div id="loadingSeatsIndicator" class="loading-indicator" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i> Loading seat map...
+            </div>
+            <div class="seat-legend">
+                <div class="legend-item"><span class="seat-example available"></span> Available</div>
+                <div class="legend-item"><span class="seat-example selected"></span> Selected</div>
+                <div class="legend-item"><span class="seat-example occupied"></span> Occupied</div>
+                <div class="legend-item"><span class="seat-example premium"></span> Premium (P)</div>
+                <div class="legend-item"><span class="seat-example vip"></span> VIP (V)</div> </div>
+        </div>
+
+        <div class="booking-summary-panel">
+            <h3>Your Selection</h3>
+            <div class="summary-item">
+                <span>Movie:</span>
+                <strong id="summaryMovieTitle">N/A</strong>
+            </div>
+            <div class="summary-item">
+                <span>Showtime:</span>
+                <strong id="summaryShowtimeDateTime">N/A</strong>
+            </div>
+            <div class="summary-item" id="summarySelectedSeatsList">
+                <span>Seats:</span>
+                <strong id="summarySelectedSeatsOutput">None</strong>
+            </div>
+            <div class="summary-item">
+                <span>Tickets:</span>
+                <strong id="summaryTicketCount">0</strong>
+            </div>
+            <div class="summary-item total">
+                <span>Total Price:</span>
+                <strong id="summaryTotalPrice">₹0.00</strong>
+            </div>
+            <button class="btn btn-primary btn-block" id="proceedToPaymentBtn" disabled>
+                Proceed to Payment <i class="fas fa-arrow-right icon-right"></i>
+            </button>
+        </div>
+    </main>
+    
+    <footer class="app-footer minimal-footer">
+        <p>&copy; <span id="currentYear"></span> CineVerse</p>
+    </footer>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/seat-selection.js"></script>
+    <script src="/js/theme-switcher.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Details | CineVerse</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Page specific styles for movie-details.html */
+        .page-movie-details .movie-details-backdrop {
+            height: 60vh;
+            max-height: 500px;
+            background-size: cover;
+            background-position: center 30%; /* Prefer a higher part of backdrop */
+            position: relative;
+            border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: calc(var(--spacing-unit) * -10); /* Pull content up */
+            z-index: 1;
+        }
+        .page-movie-details .movie-details-backdrop::before { /* Gradient overlay */
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(var(--color-background-primary-rgb), 0.2) 0%, rgba(var(--color-background-primary-rgb), 0.9) 80%, var(--color-background-primary) 100%);
+            z-index: 2;
+            border-radius: inherit;
+        }
+
+        .page-movie-details .movie-details-content-wrapper {
+            position: relative;
+            z-index: 3; /* Above backdrop overlay */
+            padding-top: calc(var(--spacing-unit) * 4); /* Space for title etc. */
+            display: flex;
+            gap: calc(var(--spacing-unit) * 4);
+            align-items: flex-start; /* Align poster and info block at their top */
+        }
+
+        .page-movie-details .movie-details-poster {
+            flex-shrink: 0;
+            width: 280px; /* Fixed width for poster column */
+            margin-top: calc(var(--spacing-unit) * -12); /* Poster overlaps backdrop */
+            text-align: center;
+        }
+        .page-movie-details .movie-details-poster img {
+            width: 100%;
+            height: auto;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            border: 3px solid rgba(255,255,255,0.1); /* Subtle highlight */
+            margin-bottom: var(--spacing-unit);
+        }
+        .page-movie-details .movie-average-rating-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-unit);
+            padding: var(--spacing-unit) 0;
+            background-color: rgba(var(--color-surface-secondary-rgb), 0.7);
+            border-radius: var(--border-radius-md);
+            margin-top: calc(var(--spacing-unit)*1.5);
+        }
+        .page-movie-details .movie-average-rating-display .stars { color: var(--color-warning); font-size: 1.2rem; line-height: 1;}
+        .page-movie-details .movie-average-rating-display .rating-value { font-size: var(--font-size-lg); font-weight: 700; color: var(--color-text-primary); line-height: 1;}
+        .page-movie-details .movie-average-rating-display .review-count { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1;}
+
+        .page-movie-details .movie-info-details {
+            flex-grow: 1;
+            padding-top: var(--spacing-unit); /* Align with top of poster visually */
+        }
+        .page-movie-details .movie-info-details .movie-title-main {
+            font-size: calc(var(--font-size-h1) * 0.9); /* Slightly smaller H1 */
+            font-weight: 800;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-unit);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.7); /* For readability on backdrop */
+        }
+        .page-movie-details .movie-meta-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-unit) calc(var(--spacing-unit) * 3);
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+            margin-bottom: calc(var(--spacing-unit) * 2.5);
+        }
+        .page-movie-details .movie-meta-info span { display: inline-flex; align-items: center; }
+        .page-movie-details .movie-meta-info i { margin-right: var(--spacing-unit); color: var(--color-accent-primary); }
+
+        .page-movie-details .movie-synopsis {
+            font-size: var(--font-size-md);
+            line-height: 1.7;
+            color: var(--color-text-secondary);
+            margin-bottom: calc(var(--spacing-unit) * 3);
+            max-width: 800px; /* Limit synopsis width for readability */
+        }
+
+        /* Trailer Section Styles (NEW) */
+        .page-movie-details .section-trailer {
+            margin-top: calc(var(--spacing-unit) * 4);
+            background-color: var(--color-surface-primary);
+            padding: calc(var(--spacing-unit) * 3);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+        .page-movie-details .section-trailer .section-header {
+            border-bottom: 1px solid var(--color-border-divider);
+            padding-bottom: var(--spacing-unit);
+            margin-bottom: calc(var(--spacing-unit) * 2.5);
+        }
+        .page-movie-details .section-trailer .section-header h2 {
+            font-size: var(--font-size-h3);
+            color: var(--color-text-primary);
+            display: flex;
+            align-items: center;
+        }
+        .page-movie-details .section-trailer .section-header h2 i {
+            margin-right: var(--spacing-unit);
+            color: var(--color-accent-primary); /* Or a YouTube red: #FF0000 */
+        }
+        .page-movie-details .trailer-embed-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-sm);
+            background-color: #000; /* Black background for the iframe area */
+        }
+        .page-movie-details .trailer-embed-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .page-movie-details #trailerMessage.message-area {
+            text-align: center;
+            padding: var(--spacing-unit) * 2;
+        }
+
+
+        /* Cast & Crew Section Styles */
+        .page-movie-details .section-cast-crew {
+            margin-top: calc(var(--spacing-unit) * 4);
+            background-color: var(--color-surface-primary);
+            padding: calc(var(--spacing-unit) * 3);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+        .page-movie-details .section-cast-crew .section-header {
+            border-bottom: 1px solid var(--color-border-divider);
+            padding-bottom: var(--spacing-unit);
+            margin-bottom: calc(var(--spacing-unit) * 2.5);
+        }
+        .page-movie-details .section-cast-crew .section-header h2 {
+            font-size: var(--font-size-h3);
+            color: var(--color-text-primary);
+        }
+        .page-movie-details .cast-crew-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
+            gap: calc(var(--spacing-unit) * 3);
+        }
+        .page-movie-details .cast-member-card {
+            text-align: center;
+            background-color: var(--color-surface-secondary);
+            padding: var(--spacing-unit);
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--color-border-primary);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .page-movie-details .cast-member-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        .page-movie-details .cast-member-image-wrapper {
+            width: 100px; 
+            height: 100px;
+            border-radius: 50%; 
+            overflow: hidden;
+            margin: 0 auto calc(var(--spacing-unit) * 1.5) auto; 
+            background-color: var(--color-surface-tertiary); 
+            border: 3px solid var(--color-border-divider); 
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .page-movie-details .cast-member-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+        }
+        .page-movie-details .cast-member-name {
+            font-size: var(--font-size-md); 
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: calc(var(--spacing-unit) * 0.5);
+            line-height: 1.3;
+        }
+        .page-movie-details .cast-member-role { 
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+            line-height: 1.2;
+            min-height: calc(var(--font-size-sm) * 2.4); 
+        }
+        
+        .page-movie-details .section-showtimes,
+        .page-movie-details .section-reviews {
+            margin-top: calc(var(--spacing-unit) * 4); 
+            background-color: var(--color-surface-primary);
+            padding: calc(var(--spacing-unit) * 3);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+        .page-movie-details .section-showtimes .section-header,
+        .page-movie-details .section-reviews .section-header {
+             border-bottom: 1px solid var(--color-border-divider);
+             padding-bottom: var(--spacing-unit);
+             margin-bottom: calc(var(--spacing-unit) * 3);
+        }
+         .page-movie-details .section-showtimes .section-header h2,
+         .page-movie-details .section-reviews .section-header h2 {
+            font-size: var(--font-size-h3);
+            color: var(--color-text-primary);
+        }
+
+        .page-movie-details .showtimes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: calc(var(--spacing-unit) * 2.5);
+        }
+        .page-movie-details .showtime-card {
+            background-color: var(--color-surface-secondary);
+            padding: calc(var(--spacing-unit) * 2);
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--color-border-primary);
+            transition: var(--transition-main);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .page-movie-details .showtime-card:hover {
+            border-color: var(--color-accent-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 0 15px var(--color-accent-primary-glow);
+        }
+        .page-movie-details .showtime-card-header h3 { font-size: var(--font-size-lg); font-weight: 600; color: var(--color-text-primary); margin-bottom: calc(var(--spacing-unit) * 0.5); }
+        .page-movie-details .showtime-card-header p { font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-bottom: var(--spacing-unit); }
+        .page-movie-details .showtime-card-body .time-slot {
+            display: inline-block; background-color: var(--color-accent-primary); color: var(--color-text-on-accent);
+            padding: calc(var(--spacing-unit) * 0.75) calc(var(--spacing-unit) * 1.5); border-radius: var(--border-radius-pill);
+            font-weight: 600; font-size: var(--font-size-md); margin-bottom: var(--spacing-unit); cursor: pointer; transition: var(--transition-colors);
+        }
+         .page-movie-details .showtime-card-body .time-slot:hover { background-color: var(--color-accent-primary-hover); }
+        .page-movie-details .showtime-card-footer { margin-top: var(--spacing-unit); text-align: right; }
+        .page-movie-details .showtime-card-footer .btn-book-seats { font-size: var(--font-size-sm); }
+
+        .page-movie-details .review-form-container {
+            background-color: var(--color-surface-secondary); padding: calc(var(--spacing-unit) * 2.5);
+            border-radius: var(--border-radius-md); margin-bottom: calc(var(--spacing-unit) * 3); border: 1px solid var(--color-border-primary);
+        }
+        .page-movie-details .review-form-container h3 { font-size: var(--font-size-lg); margin-bottom: calc(var(--spacing-unit) * 2); }
+        .page-movie-details .star-rating { display: flex; flex-direction: row-reverse; justify-content: flex-end; margin-bottom: calc(var(--spacing-unit) * 1.5); }
+        .page-movie-details .star-rating input[type="radio"] { display: none; }
+        .page-movie-details .star-rating label { font-size: 2rem; color: var(--color-text-tertiary); cursor: pointer; transition: color var(--transition-duration-fast) var(--transition-timing-function); padding: 0 calc(var(--spacing-unit) * 0.25); }
+        .page-movie-details .star-rating input[type="radio"]:checked ~ label,
+        .page-movie-details .star-rating label:hover,
+        .page-movie-details .star-rating label:hover ~ label { color: var(--color-warning); }
+        .page-movie-details .star-rating input[type="radio"]:checked + label:hover,
+        .page-movie-details .star-rating input[type="radio"]:checked + label:hover ~ label,
+        .page-movie-details .star-rating input[type="radio"]:checked ~ label:hover,
+        .page-movie-details .star-rating input[type="radio"]:checked ~ label:hover ~ label,
+        .page-movie-details .star-rating label:hover ~ input[type="radio"]:checked ~ label { color: var(--color-warning); }
+        .page-movie-details #reviewText { min-height: 100px; resize: vertical; }
+
+        .page-movie-details .reviews-list { display: flex; flex-direction: column; gap: calc(var(--spacing-unit) * 2.5); }
+        .page-movie-details .review-card { background-color: var(--color-surface-secondary); padding: calc(var(--spacing-unit) * 2); border-radius: var(--border-radius-md); border: 1px solid var(--color-border-primary); }
+        .page-movie-details .review-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-unit); }
+        .page-movie-details .review-card-header .username { font-weight: 600; color: var(--color-text-primary); }
+        .page-movie-details .review-card-header .review-date { font-size: var(--font-size-sm); color: var(--color-text-tertiary); }
+        .page-movie-details .review-card-body .stars-display { color: var(--color-warning); margin-bottom: calc(var(--spacing-unit) * 0.5); font-size: 1.1rem; }
+        .page-movie-details .review-card-body .review-text-content { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.6; white-space: pre-wrap; }
+        .page-movie-details .review-actions button { margin-left: var(--spacing-unit); }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .page-movie-details .movie-details-backdrop {
+                height: 40vh;
+                margin-bottom: calc(var(--spacing-unit) * -8);
+            }
+            .page-movie-details .movie-details-content-wrapper {
+                flex-direction: column;
+                align-items: center; 
+                text-align: center;
+            }
+            .page-movie-details .movie-details-poster {
+                width: 200px; 
+                margin-top: calc(var(--spacing-unit) * -10);
+                margin-bottom: var(--spacing-unit);
+            }
+            .page-movie-details .movie-info-details .movie-title-main {
+                font-size: calc(var(--font-size-h2) * 0.9);
+            }
+            .page-movie-details .movie-meta-info {
+                justify-content: center; 
+            }
+            .page-movie-details .section-trailer, /* Ensure responsive margin for trailer section */
+            .page-movie-details .section-showtimes,
+            .page-movie-details .section-reviews,
+            .page-movie-details .section-cast-crew { 
+                margin-top: calc(var(--spacing-unit) * 3); 
+            }
+             .page-movie-details .cast-crew-grid {
+                 grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+                 gap: calc(var(--spacing-unit) * 2);
+            }
+            .page-movie-details .cast-member-image-wrapper {
+                width: 80px; height: 80px; 
+            }
+            .page-movie-details .cast-member-name { font-size: var(--font-size-sm); }
+            .page-movie-details .cast-member-role { font-size: calc(var(--font-size-sm) * 0.9); min-height: calc(var(--font-size-sm) * 0.9 * 2.4); }
+        }
+        @media (max-width: 480px) {
+            .page-movie-details .cast-crew-grid {
+                 grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+            .page-movie-details .cast-member-image-wrapper {
+                width: 60px; height: 60px;
+            }
+        }
+    </style>
+</head>
+<body class="page-movie-details">
+
+    <header class="app-header">
+        <div class="header-content">
+            <a href="/user-dashboard.html" class="header-logo">
+                <i class="fas fa-film"></i>
+                <span>CineVerse</span>
+            </a>
+            <nav class="header-nav">
+                <a href="/user-dashboard.html" class="nav-link">Now Showing</a>
+                <a href="/my-bookings.html" class="nav-link">My Bookings</a>
+            </nav>
+            <div class="user-profile">
+                <button id="themeSwitcher" class="theme-switcher" title="Toggle theme">
+                    <i class="fas fa-sun theme-switcher-icon"></i>
+                    <i class="fas fa-moon theme-switcher-icon"></i>
+                </button>
+                <span id="userWelcomeText" class="welcome-text">Welcome!</span>
+                <button class="btn btn-icon btn-logout" id="logoutButton" aria-label="Logout" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <button id="goBackButton" class="btn-go-back" style="display: none;">
+            <i class="fas fa-arrow-left"></i> Go Back
+        </button>
+
+        <div id="movieDetailsContainer">
+            <section class="movie-details-backdrop" id="movieBackdrop">
+                </section>
+
+            <div class="movie-details-content-wrapper">
+                <div class="movie-details-poster">
+                    <img id="moviePosterImage" src="/images/placeholder-poster.png" alt="Movie Poster" onerror="this.onerror=null;this.src='/images/placeholder-poster.png';">
+                    <div id="movieAverageRating" class="movie-average-rating-display">
+                        <span class="stars"><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></span>
+                        <span class="rating-value">N/A</span>
+                        <span class="review-count">(0 Reviews)</span>
+                    </div>
+                </div>
+                <div class="movie-info-details">
+                    <h1 id="movieTitle" class="movie-title-main">Loading Movie...</h1>
+                    <div class="movie-meta-info">
+                        <span id="movieReleaseDate"><i class="fas fa-calendar-alt"></i> <span>Loading...</span></span>
+                        <span id="movieDuration"><i class="fas fa-clock"></i> <span>Loading...</span></span>
+                        <span id="movieGenre"><i class="fas fa-tag"></i> <span>Loading...</span></span>
+                    </div>
+                    <p id="movieSynopsis" class="movie-synopsis">Loading synopsis...</p>
+                </div>
+            </div>
+        </div>
+
+        <section class="section-trailer" id="movieTrailerSection" style="display: none;"> <div class="section-header">
+                <h2><i class="fab fa-youtube"></i> Official Trailer</h2>
+            </div>
+            <div id="trailerEmbedContainer" class="trailer-embed-container">
+                </div>
+            <div id="trailerMessage" class="message-area" style="display: none;"></div>
+        </section>
+
+
+        <section class="section-cast-crew">
+            <div class="section-header">
+                <h2>Cast & Crew</h2>
+            </div>
+            <div id="castCrewMessage" class="message-area" style="display: none;"></div>
+            <div id="loadingCastCrewIndicator" class="loading-indicator" style="display: none; justify-content: center; align-items: center; padding: calc(var(--spacing-unit) * 2);">
+                <i class="fas fa-spinner fa-spin fa-2x"></i> <span style="margin-left: var(--spacing-unit);">Loading cast & crew...</span>
+            </div>
+            <div id="castCrewGridContainer" class="cast-crew-grid">
+                </div>
+        </section>
+
+        <section class="section-showtimes">
+            <div class="section-header">
+                <h2>Available Showtimes</h2>
+            </div>
+            <div id="showtimesMessage" class="message-area" style="display: none;"></div>
+            <div id="loadingShowtimesIndicator" class="loading-indicator" style="display: none; justify-content: center; align-items: center; padding: var(--spacing-unit) * 2;">
+                <i class="fas fa-spinner fa-spin fa-2x"></i> <span style="margin-left: var(--spacing-unit);">Loading showtimes...</span>
+            </div>
+            <div id="showtimesGridContainer" class="showtimes-grid">
+                </div>
+        </section>
+
+        <section class="section-reviews">
+            <div class="section-header">
+                <h2>User Reviews</h2>
+            </div>
+            <div id="addReviewSection" class="review-form-container" style="display: none;">
+                 <h3><i class="fas fa-pencil-alt icon-left"></i>Write a Review</h3>
+                <form id="reviewForm">
+                    <div class="form-group">
+                        <label>Your Rating:</label>
+                        <div class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5" required><label for="star5" title="5 stars"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="4 stars"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="3 stars"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="2 stars"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="1 star"><i class="fas fa-star"></i></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reviewText"><i class="fas fa-comment-dots icon-form"></i>Your Review:</label>
+                        <textarea id="reviewText" name="review_text" class="form-control" placeholder="Share your thoughts about the movie..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Review <i class="fas fa-paper-plane icon-right"></i></button>
+                </form>
+                <div id="reviewFormMessage" class="message-area" style="display: none; margin-top: var(--spacing-unit);"></div>
+            </div>
+             <div id="reviewLoginPrompt" class="message-area info" style="display: none;">
+                <p><a href="/login.html">Log in</a> to write a review.</p>
+            </div>
+            <div id="reviewsMessage" class="message-area" style="display: none;"></div>
+            <div id="loadingReviewsIndicator" class="loading-indicator" style="display: none; justify-content: center; align-items: center; padding: var(--spacing-unit) * 2;">
+                <i class="fas fa-spinner fa-spin fa-2x"></i> <span style="margin-left: var(--spacing-unit);">Loading reviews...</span>
+            </div>
+            <div id="reviewsListContainer" class="reviews-list">
+                </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>&copy; <span id="currentYear"></span> CineVerse. All rights reserved.</p>
+    </footer>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/movie-details.js"></script>
+    <script src="/js/theme-switcher.js" defer></script> 
+</body>
+</html>

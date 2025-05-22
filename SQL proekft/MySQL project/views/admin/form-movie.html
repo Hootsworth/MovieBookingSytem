@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Form | CineVerse Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Ensure admin layout styles from style.css or embedded here apply */
+        .page-admin-form .main-container { display: flex; gap: calc(var(--spacing-unit) * 3); }
+        .admin-sidebar {
+            flex: 0 0 var(--sidebar-width, 280px); background-color: var(--color-surface-primary);
+            padding: calc(var(--spacing-unit) * 3); border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md); height: fit-content; border: 1px solid var(--color-border-divider);
+        }
+        .admin-sidebar h2 { font-size: var(--font-size-xl); color: var(--color-text-primary); margin-bottom: calc(var(--spacing-unit) * 2.5); padding-bottom: var(--spacing-unit); border-bottom: 1px solid var(--color-border-divider); display: flex; align-items: center; }
+        .admin-sidebar h2 i { margin-right: var(--spacing-unit); color: var(--color-accent-tertiary); }
+        .admin-nav ul { list-style: none; padding-left: 0; } 
+        .admin-nav li a { display: flex; align-items: center; gap: var(--spacing-unit); padding: calc(var(--spacing-unit) * 1.5) var(--spacing-unit); color: var(--color-text-secondary); text-decoration: none; border-radius: var(--border-radius-sm); font-weight: 500; font-size: var(--font-size-md); transition: var(--transition-colors); }
+        .admin-nav li a:hover, .admin-nav li a.active { background-color: var(--color-surface-secondary); color: var(--color-accent-primary); }
+        .admin-nav li a i { width: 22px; text-align: center; color: var(--color-accent-tertiary); transition: var(--transition-colors); }
+        .admin-nav li a:hover i, .admin-nav li a.active i { color: var(--color-accent-primary); }
+
+        .admin-form-content { flex-grow: 1; }
+        .admin-form-card { background-color: var(--color-surface-primary); padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 4); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--color-border-divider); }
+        .admin-form-card .form-page-title {
+            font-size: var(--font-size-h2); color: var(--color-text-primary);
+            margin-bottom: calc(var(--spacing-unit) * 3); padding-bottom: var(--spacing-unit);
+            border-bottom: 1px solid var(--color-border-divider); display: flex; align-items: center;
+        }
+        .admin-form-card .form-page-title i { margin-right: var(--spacing-unit); color: var(--color-accent-primary); }
+        
+        textarea.form-control { min-height: 120px; resize: vertical; }
+
+        /* Cast Management Styles */
+        .cast-management-section {
+            margin-top: calc(var(--spacing-unit) * 3);
+            padding-top: calc(var(--spacing-unit) * 2);
+            border-top: 1px solid var(--color-border-divider);
+        }
+        .cast-management-section h4 {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-primary);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+            display: flex;
+            align-items: center;
+        }
+        .cast-management-section h4 i {
+            margin-right: var(--spacing-unit);
+            color: var(--color-accent-secondary); /* Different color for sub-section icon */
+        }
+        .cast-member-entry {
+            background-color: var(--color-surface-secondary);
+            padding: calc(var(--spacing-unit) * 2);
+            border-radius: var(--border-radius-md);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+            border: 1px solid var(--color-border-primary);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive columns for fields */
+            gap: var(--spacing-unit) * 1.5;
+            align-items: end; /* Align items at the bottom for button alignment */
+        }
+        .cast-member-entry .form-group {
+            margin-bottom: 0; /* Remove default bottom margin as gap is used */
+        }
+        .cast-member-entry .character-name-group {
+            /* JS will show/hide this */
+        }
+         .cast-member-entry .btn-remove-cast {
+            margin-top: calc(var(--spacing-unit) * 2.5); /* Align with form fields */
+            height: fit-content; /* Adjust to button content */
+            align-self: end; /* Ensure it aligns with the bottom of other elements */
+        }
+
+        .form-actions { 
+            margin-top: calc(var(--spacing-unit) * 4); 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: calc(var(--spacing-unit) * 2); 
+        }
+
+
+        @media (max-width: 992px) {
+            .page-admin-form .main-container { flex-direction: column; }
+            .admin-sidebar { width: 100%; margin-bottom: calc(var(--spacing-unit) * 3); }
+        }
+         @media (max-width: 768px) {
+            .cast-member-entry {
+                grid-template-columns: 1fr; /* Stack fields on smaller screens */
+            }
+            .cast-member-entry .btn-remove-cast {
+                margin-top: var(--spacing-unit); 
+                width: 100%; /* Full width remove button */
+            }
+        }
+    </style>
+</head>
+<body class="page-admin-form">
+
+    <header class="app-header">
+        <div class="header-content">
+            <a href="/admin/dashboard.html" class="header-logo"><i class="fas fa-shield-halved"></i><span>CineVerse Admin</span></a>
+            <div class="user-profile">
+                <span id="userWelcomeText" class="welcome-text">Welcome, Admin!</span>
+                <button class="btn btn-icon btn-logout" id="logoutButton" aria-label="Logout" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <aside class="admin-sidebar">
+            <h2><i class="fas fa-cogs"></i>Management</h2>
+            <nav class="admin-nav">
+                <ul>
+                    <li><a href="/admin/dashboard.html" id="navDashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="/admin/manage-movies.html" id="navManageMovies" class="active"><i class="fas fa-film"></i> Movies</a></li>
+                    <li><a href="/admin/manage-theatres.html" id="navManageTheatres"><i class="fas fa-landmark"></i> Theatres</a></li>
+                    <li><a href="/admin/manage-showtimes.html" id="navManageShowtimes"><i class="fas fa-calendar-alt"></i> Showtimes</a></li>
+                    <li><a href="/admin/manage-users.html" id="navManageUsers"><i class="fas fa-users-cog"></i> Users</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <section class="admin-form-content">
+            <div class="admin-form-card">
+                <h3 id="movieFormTitle" class="form-page-title"><i class="fas fa-plus-circle"></i>Add New Movie</h3>
+                <div id="movieFormMessage" class="message-area" style="display:none;"></div>
+                
+                <form id="movieForm">
+                    <input type="hidden" id="movieId" name="movie_id">
+                    
+                    <h4><i class="fas fa-info-circle"></i> Movie Details</h4>
+                    <div class="form-group">
+                        <label for="movieTitle"><i class="fas fa-heading icon-form"></i>Movie Title</label>
+                        <input type="text" id="movieTitle" name="title" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="movieGenre"><i class="fas fa-tags icon-form"></i>Genre(s)</label>
+                        <input type="text" id="movieGenre" name="genre" class="form-control" placeholder="e.g., Action, Sci-Fi, Drama" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="movieDuration"><i class="fas fa-clock icon-form"></i>Duration (minutes)</label>
+                        <input type="number" id="movieDuration" name="duration" class="form-control" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="movieReleaseDate"><i class="fas fa-calendar-day icon-form"></i>Release Date</label>
+                        <input type="date" id="movieReleaseDate" name="release_date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="moviePosterUrl"><i class="fas fa-image icon-form"></i>Poster Image URL</label>
+                        <input type="url" id="moviePosterUrl" name="poster_image_url" class="form-control" placeholder="https://example.com/images/poster.jpg">
+                    </div>
+                    <div class="form-group">
+                        <label for="movieBackdropUrl"><i class="fas fa-photo-video icon-form"></i>Backdrop Image URL</label>
+                        <input type="url" id="movieBackdropUrl" name="backdrop_image_url" class="form-control" placeholder="https://example.com/images/backdrop.jpg">
+                    </div>
+                     <div class="form-group">
+                        <label for="movieTrailerUrl"><i class="fab fa-youtube icon-form"></i>YouTube Trailer URL</label>
+                        <input type="url" id="movieTrailerUrl" name="trailer_youtube_url" class="form-control" placeholder="https://www.youtube.com/embed/your_video_id">
+                        <small class="form-text text-muted">Please use the YouTube embed URL format (e.g., https://www.youtube.com/embed/VIDEO_ID).</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="movieSynopsis"><i class="fas fa-file-alt icon-form"></i>Synopsis</label>
+                        <textarea id="movieSynopsis" name="synopsis" class="form-control" placeholder="Enter a brief summary of the movie..."></textarea>
+                    </div>
+
+                    <section class="cast-management-section">
+                        <h4><i class="fas fa-users"></i> Manage Cast & Crew</h4>
+                        <div id="castMembersContainer">
+                            </div>
+                        <div style="margin-top: var(--spacing-unit); display: flex; gap: var(--spacing-unit);">
+                            <button type="button" id="addCastMemberButton" class="btn btn-outline btn-small">
+                                <i class="fas fa-user-plus icon-left"></i>Add Cast/Crew
+                            </button>
+                        </div>
+                    </section>
+                    <div class="form-actions">
+                        <a href="/admin/manage-movies.html" class="btn btn-outline" style="border-color: var(--color-text-secondary); color: var(--color-text-secondary);">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save icon-left"></i><span id="movieFormSubmitButtonText">Save Movie</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <template id="castMemberTemplate">
+        <div class="cast-member-entry">
+            <input type="hidden" name="cast_id[]" class="cast-id-input"> <div class="form-group">
+                <label><i class="fas fa-user icon-form"></i>Person Name</label>
+                <input type="text" name="cast_person_name[]" class="form-control cast-person-name" required placeholder="e.g., Tom Hanks">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-user-tag icon-form"></i>Role</label>
+                <select name="cast_role_type[]" class="form-control cast-role-type" required>
+                    <option value="Actor" selected>Actor</option>
+                    <option value="Director">Director</option>
+                    <option value="Writer">Writer</option>
+                    <option value="Producer">Producer</option>
+                </select>
+            </div>
+            <div class="form-group character-name-group"> <label><i class="fas fa-theater-masks icon-form"></i>Character Name</label>
+                <input type="text" name="cast_character_name[]" class="form-control cast-character-name" placeholder="e.g., Forrest Gump (if Actor)">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-camera icon-form"></i>Image URL</label>
+                <input type="url" name="cast_image_url[]" class="form-control cast-image-url" placeholder="https://example.com/profile.jpg">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-sort-numeric-down icon-form"></i>Display Order</label>
+                <input type="number" name="cast_display_order[]" class="form-control cast-display-order" value="0" min="0">
+            </div>
+            <button type="button" class="btn btn-danger btn-small btn-remove-cast" title="Remove this person">
+                <i class="fas fa-trash"></i> Remove
+            </button>
+        </div>
+    </template>
+
+
+    <footer class="app-footer">
+        <p>&copy; <span id="currentYear"></span> CineVerse Admin Panel.</p>
+    </footer>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/admin/admin-movies.js"></script> 
+</body>
+</html>

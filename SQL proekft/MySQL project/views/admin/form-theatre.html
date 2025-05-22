@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theatre Form | CineVerse Admin</title> <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Reusing admin layout styles */
+        .page-admin-form .main-container { display: flex; gap: calc(var(--spacing-unit) * 3); }
+        .admin-sidebar { /* Styles are in common.css or admin-dashboard.html, ensure they apply */
+            flex: 0 0 var(--sidebar-width, 280px); background-color: var(--color-surface-primary);
+            padding: calc(var(--spacing-unit) * 3); border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md); height: fit-content; border: 1px solid var(--color-border-divider);
+        }
+        .admin-sidebar h2 { font-size: var(--font-size-xl); color: var(--color-text-primary); margin-bottom: calc(var(--spacing-unit) * 2.5); padding-bottom: var(--spacing-unit); border-bottom: 1px solid var(--color-border-divider); display: flex; align-items: center; }
+        .admin-sidebar h2 i { margin-right: var(--spacing-unit); color: var(--color-accent-tertiary); }
+        .admin-nav ul { list-style: none; }
+        .admin-nav li a { display: flex; align-items: center; gap: var(--spacing-unit); padding: calc(var(--spacing-unit) * 1.5) var(--spacing-unit); color: var(--color-text-secondary); text-decoration: none; border-radius: var(--border-radius-sm); font-weight: 500; font-size: var(--font-size-md); transition: var(--transition-colors); }
+        .admin-nav li a:hover, .admin-nav li a.active { background-color: var(--color-surface-secondary); color: var(--color-accent-primary); }
+        .admin-nav li a i { width: 22px; text-align: center; color: var(--color-accent-tertiary); transition: var(--transition-colors); }
+        .admin-nav li a:hover i, .admin-nav li a.active i { color: var(--color-accent-primary); }
+
+        .admin-form-content { flex-grow: 1; }
+        .admin-form-card { background-color: var(--color-surface-primary); padding: calc(var(--spacing-unit) * 4); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--color-border-divider); }
+        .admin-form-card .form-page-title {
+            font-size: var(--font-size-h2); color: var(--color-text-primary);
+            margin-bottom: calc(var(--spacing-unit) * 3); padding-bottom: var(--spacing-unit);
+            border-bottom: 1px solid var(--color-border-divider); display: flex; align-items: center;
+        }
+        .admin-form-card .form-page-title i { margin-right: var(--spacing-unit); color: var(--color-accent-primary); }
+        .form-actions { margin-top: calc(var(--spacing-unit) * 4); display: flex; justify-content: flex-end; gap: calc(var(--spacing-unit) * 2); }
+
+        .screens-management-section h4 {
+            font-size: var(--font-size-lg); color: var(--color-text-primary);
+            margin-top: calc(var(--spacing-unit) * 3); margin-bottom: var(--spacing-unit);
+            padding-bottom: calc(var(--spacing-unit) * 0.5);
+            border-bottom: 1px solid var(--color-border-divider);
+        }
+        .screen-entry-card {
+            background-color: var(--color-surface-secondary); padding: calc(var(--spacing-unit) * 2.5);
+            border-radius: var(--border-radius-md); margin-bottom: calc(var(--spacing-unit) * 2);
+            border: 1px solid var(--color-border-primary);
+        }
+        .screen-entry-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-unit); }
+        .screen-entry-header h5 { font-size: var(--font-size-md); color: var(--color-text-primary); margin: 0; }
+        .remove-screen-btn {
+            background-color: var(--color-error); color: var(--color-text-primary); border: none;
+            padding: calc(var(--spacing-unit)*0.75) var(--spacing-unit); font-size: var(--font-size-sm);
+            border-radius: var(--border-radius-sm); cursor: pointer; transition: var(--transition-colors);
+        }
+        .remove-screen-btn:hover { background-color: color-mix(in srgb, var(--color-error) 80%, black); }
+        .input-hint { font-size: var(--font-size-sm); color: var(--color-text-tertiary); margin-top: calc(var(--spacing-unit)*0.5); }
+
+         @media (max-width: 992px) {
+            .page-admin-form .main-container { flex-direction: column; }
+            .admin-sidebar { width: 100%; margin-bottom: calc(var(--spacing-unit) * 3); }
+        }
+    </style>
+</head>
+<body class="page-admin-form">
+
+    <header class="app-header">
+        <div class="header-content">
+            <a href="/admin/dashboard.html" class="header-logo"><i class="fas fa-shield-halved"></i><span>CineVerse Admin</span></a>
+            <div class="user-profile">
+                <span id="userWelcomeText" class="welcome-text">Welcome, Admin!</span>
+                <button class="btn btn-icon btn-logout" id="logoutButton" aria-label="Logout" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <aside class="admin-sidebar">
+            <h2><i class="fas fa-cogs"></i>Management</h2>
+            <nav class="admin-nav">
+                <ul>
+                    <li><a href="/admin/dashboard.html" id="navDashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="/admin/manage-movies.html" id="navManageMovies"><i class="fas fa-film"></i> Movies</a></li>
+                    <li><a href="/admin/manage-theatres.html" id="navManageTheatres" class="active"><i class="fas fa-landmark"></i> Theatres</a></li>
+                    <li><a href="/admin/manage-showtimes.html" id="navManageShowtimes"><i class="fas fa-calendar-alt"></i> Showtimes</a></li>
+                    <li><a href="/admin/manage-users.html" id="navManageUsers"><i class="fas fa-users-cog"></i> Users</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <section class="admin-form-content">
+            <div class="admin-form-card">
+                <h3 id="theatreFormTitle" class="form-page-title"><i class="fas fa-plus-circle"></i>Add New Theatre</h3>
+                <div id="theatreFormMessage" class="message-area" style="display:none;"></div>
+                <form id="theatreForm">
+                    <input type="hidden" id="theatreId" name="theater_id"> <div class="form-group">
+                        <label for="theatreNameInput"><i class="fas fa-signature icon-form"></i>Theatre Name</label>
+                        <input type="text" id="theatreNameInput" name="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="theatreLocationInput"><i class="fas fa-map-marker-alt icon-form"></i>Location</label>
+                        <input type="text" id="theatreLocationInput" name="location" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="theatreTotalSeatsInput"><i class="fas fa-chair icon-form"></i>Theatre's Overall Capacity (Approx.)</label>
+                        <input type="number" id="theatreTotalSeatsInput" name="total_seats" class="form-control" required min="1">
+                        <p class="input-hint">This is a general capacity. Actual capacity is sum of screen seats.</p>
+                    </div>
+
+                    <div class="screens-management-section">
+                        <h4>Screens for this Theatre</h4>
+                        <div id="screensContainerDynamic">
+                            </div>
+                        <button type="button" id="addScreenEntryButton" class="btn btn-outline" style="margin-top: var(--spacing-unit); margin-bottom: calc(var(--spacing-unit)*2);">
+                            <i class="fas fa-plus icon-left"></i> Add Screen
+                        </button>
+                        <p class="input-hint">Note: Editing screens (number of seats) for an existing theatre might affect existing showtimes and bookings. Deleting screens will remove associated seats and showtimes.</p>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <a href="/admin/manage-theatres.html" class="btn btn-outline" style="border-color: var(--color-text-secondary); color: var(--color-text-secondary);">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save icon-left"></i><span id="theatreFormSubmitButtonText">Save Theatre</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>&copy; <span id="currentYear"></span> CineVerse Admin Panel.</p>
+    </footer>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/admin/admin-theatres.js"></script>
+</body>
+</html>

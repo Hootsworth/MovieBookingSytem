@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | CineVerse</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /*
+         * These styles are specifically for centering the login form on the page.
+         * All other styling (colors, fonts, button styles, card appearance, etc.)
+         * should come from your main /css/style.css file.
+         */
+        .page-login {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--color-background-primary);
+            margin: 0;
+            padding: calc(var(--spacing-unit) * 2);
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .auth-card {
+            background-color: var(--color-surface-primary);
+            padding: calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 3);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--color-border-divider);
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: calc(var(--spacing-unit) * 3);
+        }
+
+        .auth-header .header-logo {
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        #initialOptionsPanel,
+        #loginForm,
+        #registerForm,
+        #forgotPasswordForm,
+        #resetPasswordForm {
+            display: none; /* Initially hide all forms; JS will show the active one */
+        }
+
+        #initialOptionsPanel {
+             display: block; /* Show initial options by default if auth.js doesn't immediately */
+        }
+
+        .message-area {
+            /* Styling from main CSS */
+        }
+        .form-switch-text.forgot-password-link {
+            text-align: right;
+            margin-top: calc(var(--spacing-unit) * 0.5); /* Adjust as needed */
+            margin-bottom: calc(var(--spacing-unit) * 1.5); /* Space before button */
+        }
+
+    </style>
+</head>
+<body class="page-login">
+    <main class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="header-logo" style="justify-content: center; margin-bottom: 1rem;">
+                    <i class="fas fa-film"></i> <span>CineVerse</span>
+                </div>
+                <h1>Welcome</h1>
+                <p id="authFormDescription">Sign in or manage your account.</p>
+            </div>
+
+            <div id="authMessageArea" class="message-area" style="display: none;"></div>
+
+            <div id="initialOptionsPanel" class="auth-options-panel">
+                <button type="button" class="btn btn-primary btn-block" id="showUserLoginBtn">
+                    <i class="fas fa-user icon-left"></i>Sign In as User
+                </button>
+                <button type="button" class="btn btn-secondary btn-block" id="showAdminLoginBtn">
+                    <i class="fas fa-user-shield icon-left"></i>Sign In as Admin
+                </button>
+                <p class="form-switch-text">
+                    New to CineVerse? <a href="#" id="showRegisterFormLinkFromOptions">Create an Account</a>
+                </p>
+            </div>
+
+            <form id="loginForm" class="auth-form-panel">
+                <h2 id="loginFormTitle" class="form-title">User Sign In</h2>
+                <input type="hidden" id="loginType" value="Customer">
+                <div class="form-group">
+                    <label for="loginEmail"><i class="fas fa-envelope icon-form"></i>Email Address</label>
+                    <input type="email" id="loginEmail" name="email" class="form-control" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword"><i class="fas fa-lock icon-form"></i>Password</label>
+                    <input type="password" id="loginPassword" name="password" class="form-control" placeholder="••••••••" required>
+                </div>
+                <p class="form-switch-text forgot-password-link">
+                    <a href="#" id="showForgotPasswordFormLink">Forgot Password?</a>
+                </p>
+                <button type="submit" class="btn btn-primary btn-block form-submit-btn">
+                    Sign In <i class="fas fa-arrow-right icon-right"></i>
+                </button>
+                <p class="form-switch-text">
+                    Need an account? <a href="#" id="showRegisterFormLinkFromLogin">Register</a>
+                </p>
+                <p class="form-switch-text secondary-action">
+                    <a href="#" class="back-to-options-link"><i class="fas fa-chevron-left icon-left"></i> Choose login type</a>
+                </p>
+            </form>
+
+            <form id="registerForm" class="auth-form-panel">
+                <h2 class="form-title">Create Your CineVerse Account</h2>
+                <div class="form-group">
+                    <label for="registerUsername"><i class="fas fa-user-circle icon-form"></i>Username</label>
+                    <input type="text" id="registerUsername" name="username" class="form-control" placeholder="Choose a username" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail"><i class="fas fa-envelope icon-form"></i>Email Address</label>
+                    <input type="email" id="registerEmail" name="email" class="form-control" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword"><i class="fas fa-lock icon-form"></i>Password</label>
+                    <input type="password" id="registerPassword" name="password" class="form-control" placeholder="Create a strong password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block form-submit-btn">
+                    Create Account <i class="fas fa-user-plus icon-right"></i>
+                </button>
+                <p class="form-switch-text">
+                    Already registered? <a href="#" id="showLoginFormLinkFromRegister">Sign In</a>
+                </p>
+                 <p class="form-switch-text secondary-action">
+                    <a href="#" class="back-to-options-link"><i class="fas fa-chevron-left icon-left"></i> Choose login type</a>
+                </p>
+            </form>
+
+            <form id="forgotPasswordForm" class="auth-form-panel">
+                <h2 class="form-title">Forgot Password</h2>
+                <p>Enter your username and a secondary email address to receive an OTP.</p>
+                <div class="form-group">
+                    <label for="forgotUsername"><i class="fas fa-user icon-form"></i>Username</label>
+                    <input type="text" id="forgotUsername" name="username" class="form-control" placeholder="Your username" required>
+                </div>
+                <div class="form-group">
+                    <label for="forgotSecondaryEmail"><i class="fas fa-envelope-open-text icon-form"></i>Secondary Email</label>
+                    <input type="email" id="forgotSecondaryEmail" name="secondaryEmail" class="form-control" placeholder="recovery.email@example.com" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block form-submit-btn">
+                    Send OTP <i class="fas fa-paper-plane icon-right"></i>
+                </button>
+                <p class="form-switch-text secondary-action">
+                    <a href="#" id="backToLoginFromForgot"><i class="fas fa-chevron-left icon-left"></i> Back to Sign In</a>
+                </p>
+            </form>
+
+            <form id="resetPasswordForm" class="auth-form-panel">
+                <h2 class="form-title">Reset Password</h2>
+                <p>An OTP has been sent to your secondary email. Enter it below along with your new password.</p>
+                <input type="hidden" id="resetUsernameStore"> <div class="form-group">
+                    <label for="resetOtp"><i class="fas fa-key icon-form"></i>OTP</label>
+                    <input type="text" id="resetOtp" name="otp" class="form-control" placeholder="Enter OTP" required>
+                </div>
+                <div class="form-group">
+                    <label for="resetNewPassword"><i class="fas fa-lock icon-form"></i>New Password</label>
+                    <input type="password" id="resetNewPassword" name="newPassword" class="form-control" placeholder="Enter new password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block form-submit-btn">
+                    Reset Password <i class="fas fa-check-circle icon-right"></i>
+                </button>
+                <p class="form-switch-text secondary-action">
+                    <a href="#" id="backToLoginFromReset"><i class="fas fa-chevron-left icon-left"></i> Back to Sign In</a>
+                </p>
+            </form>
+
+        </div>
+    </main>
+    
+    <script src="/js/auth.js"></script>
+    <script>
+        // auth-debugger.js content ...
+        // (keeping the existing debugger script for brevity)
+        async function testLogin(email, password) {
+          console.log('🔍 Testing login with:', { email, password });
+          try {
+            const response = await fetch('/api/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, password }),
+            });
+            console.log('📡 Response status:', response.status);
+            const data = await response.json();
+            console.log('📦 Response data:', data);
+            return { status: response.status, data };
+          } catch (error) {
+            console.error('❌ Login test failed:', error);
+            return { error };
+          }
+        }
+
+        async function checkSession() {
+          console.log('🔍 Checking current session');
+          try {
+            const response = await fetch('/api/auth/session');
+            console.log('📡 Session status:', response.status);
+            const data = await response.json();
+            console.log('📦 Session data:', data);
+            return { status: response.status, data };
+          } catch (error) {
+            console.error('❌ Session check failed:', error);
+            return { error };
+          }
+        }
+
+        function inspectLoginForm() {
+          console.log('🔍 Inspecting login form elements');
+          const loginForm = document.getElementById('loginForm');
+          const emailInput = document.getElementById('loginEmail');
+          const passwordInput = document.getElementById('loginPassword');
+          console.log('📝 Login form exists:', !!loginForm);
+          console.log('📧 Email input exists:', !!emailInput);
+          console.log('🔑 Password input exists:', !!passwordInput);
+          // ... (rest of the function)
+        }
+        // ... (rest of the debug script)
+
+        window.authDebug = {
+          testLogin,
+          checkSession,
+          inspectLoginForm,
+          // runFullDebug (if defined in original)
+        };
+    </script>
+</body>
+</html>

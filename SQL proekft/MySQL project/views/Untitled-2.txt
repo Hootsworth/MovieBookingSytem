@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Booking System - Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>CinemaStream</h1>
+            <p>Your Ultimate Movie Booking Experience</p>
+        </div>
+        
+        <div class="login-options">
+            <div class="login-option user-login" id="user-login-option">
+                <div class="option-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h2>User Login</h2>
+                <p>Book tickets for your favorite movies</p>
+            </div>
+            
+            <div class="login-option admin-login" id="admin-login-option">
+                <div class="option-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h2>Admin Login</h2>
+                <p>Manage theaters, movies and showtimes</p>
+            </div>
+        </div>
+        
+        <div class="login-form" id="user-login-form">
+            <h2>User Login</h2>
+            <form id="userLoginForm">
+                <div class="form-group">
+                    <label for="userEmail">Email</label>
+                    <input type="email" id="userEmail" name="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="userPassword">Password</label>
+                    <input type="password" id="userPassword" name="password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn-login">Login</button>
+                <div class="form-footer">
+                    <p>Don't have an account? <a href="#" id="user-register-link">Register</a></p>
+                    <p><a href="#" class="back-to-options">Back to login options</a></p>
+                </div>
+            </form>
+        </div>
+        
+        <div class="login-form" id="admin-login-form">
+            <h2>Admin Login</h2>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminEmail">Email</label>
+                    <input type="email" id="adminEmail" name="email" placeholder="Enter admin email" required>
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" name="password" placeholder="Enter admin password" required>
+                </div>
+                <button type="submit" class="btn-login admin-btn">Login</button>
+                <div class="form-footer">
+                    <p><a href="#" class="back-to-options">Back to login options</a></p>
+                </div>
+            </form>
+        </div>
+        
+        <div class="login-form" id="register-form">
+            <h2>Register as User</h2>
+            <form id="userRegisterForm">
+                <div class="form-group">
+                    <label for="regUsername">Username</label>
+                    <input type="text" id="regUsername" name="username" placeholder="Choose a username" required>
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email</label>
+                    <input type="email" id="regEmail" name="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <input type="password" id="regPassword" name="password" placeholder="Create a password" required>
+                </div>
+                <div class="form-group">
+                    <label for="regConfirmPassword">Confirm Password</label>
+                    <input type="password" id="regConfirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                </div>
+                <button type="submit" class="btn-login">Register</button>
+                <div class="form-footer">
+                    <p>Already have an account? <a href="#" id="user-login-link">Login</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 CinemaStream. All rights reserved.</p>
+    </footer>
+
+    <script src="login.js"></script>
+</body>
+</html>

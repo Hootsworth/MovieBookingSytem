@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found | CineVerse</title>
+    <link rel="stylesheet" href="/css/style.css"> <style>
+        .page-404 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: calc(100vh - var(--header-height) - var(--footer-height, 70px)); /* Adjust footer height if known */
+            padding: calc(var(--spacing-unit) * 3);
+        }
+        .error-code {
+            font-size: 8rem; /* Large 404 text */
+            font-weight: 800;
+            color: var(--color-accent-primary);
+            line-height: 1;
+            margin-bottom: var(--spacing-unit);
+            text-shadow: 0 0 15px var(--color-accent-primary-glow);
+        }
+        .error-message-main {
+            font-size: var(--font-size-h2);
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-unit);
+        }
+        .error-message-secondary {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-secondary);
+            margin-bottom: calc(var(--spacing-unit) * 4);
+            max-width: 500px;
+        }
+        .error-actions .btn {
+            margin: 0 calc(var(--spacing-unit) * 1);
+        }
+    </style>
+</head>
+<body class="page-404-body"> <header class="app-header simple-header">
+         <div class="header-content">
+            <a href="/" class="header-logo"> <i class="fas fa-film"></i>
+                <span>CineVerse</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="main-container page-404">
+        <div class="error-code">404</div>
+        <h1 class="error-message-main">Oops! Page Not Found.</h1>
+        <p class="error-message-secondary">
+            The page you are looking for might have been moved, renamed, or perhaps never existed.
+            Let's get you back on track.
+        </p>
+        <div class="error-actions">
+            <a href="/user-dashboard.html" class="btn btn-primary">
+                <i class="fas fa-home icon-left"></i>Go to Homepage
+            </a>
+            <button onclick="window.history.back();" class="btn btn-outline">
+                <i class="fas fa-arrow-left icon-left"></i>Go Back
+            </button>
+        </div>
+    </main>
+
+    <footer class="app-footer minimal-footer">
+        <p>&copy; <span id="currentYear"></span> CineVerse.</p>
+    </footer>
+    <script>
+        // Minimal JS for current year, if common.js isn't loaded or needed
+        const currentYearSpan = document.getElementById('currentYear');
+        if (currentYearSpan) {
+            currentYearSpan.textContent = new Date().getFullYear();
+        }
+    </script>
+</body>
+</html>

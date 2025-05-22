@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed! | CineVerse</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        /* Ensure CSS variables from style.css are available */
+        /* Page specific styles for payment-confirmation.html */
+
+        body.page-confirmation {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Center content vertically */
+            min-height: 100vh; /* Full viewport height */
+            background-color: var(--color-background-primary); /* From your style.css */
+            padding: calc(var(--spacing-unit) * 2); /* Add some padding around the card */
+            margin: 0;
+        }
+
+        .confirmation-container { /* This is the <main> element */
+            width: 100%;
+            display: flex; /* Use flex to center its child (.confirmation-card-wrapper) */
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1; /* Allow main to take available space if header/footer are small */
+        }
+
+        .confirmation-card-wrapper { /* Renamed from .confirmation-card for clarity */
+            background-color: var(--color-surface-primary);
+            padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 4);
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            max-width: 650px; /* Max width for the main confirmation box */
+            width: 100%;
+            border: 1px solid var(--color-border-divider);
+            margin: calc(var(--spacing-unit) * 2) 0; /* Add some margin if header/footer are present */
+        }
+
+        .confirmation-icon-area { /* Renamed from .confirmation-icon for clarity */
+            font-size: 4rem; /* Larger icon */
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+        .confirmation-icon-area.success { color: var(--color-success); }
+        .confirmation-icon-area.error { color: var(--color-error); }
+
+        .confirmation-title { /* Renamed from .confirmation-main-title */
+            font-size: var(--font-size-h2);
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-unit);
+        }
+
+        .confirmation-subtitle {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-secondary);
+            margin-bottom: calc(var(--spacing-unit) * 3);
+        }
+
+        /* Ticket Styling */
+        .ticket-preview-area { /* Wrapper for the actual ticket */
+            background-color: var(--color-background-secondary); /* Slightly different background for the ticket */
+            border-radius: var(--border-radius-lg);
+            padding: calc(var(--spacing-unit) * 3);
+            margin-top: calc(var(--spacing-unit) * 2);
+            margin-bottom: calc(var(--spacing-unit) * 3);
+            border: 1px dashed var(--color-accent-primary); /* Dashed border for ticket feel */
+            box-shadow: var(--shadow-md);
+            position: relative; /* For pseudo-elements if needed for tear-off effect */
+            text-align: left; /* Align text to left inside ticket */
+        }
+        
+        /* Perforated edge effect for the ticket */
+        .ticket-preview-area::before,
+        .ticket-preview-area::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: calc(var(--spacing-unit) * 2.5); /* Size of the semi-circle cut */
+            height: calc(var(--spacing-unit) * 2.5);
+            background-color: var(--color-background-primary); /* Match page background to "cut out" */
+            border-radius: 50%;
+            transform: translateY(-50%);
+        }
+        .ticket-preview-area::before {
+            left: calc(var(--spacing-unit) * -1.25); /* Position half outside */
+             box-shadow: inset -1px 0px 2px rgba(0,0,0,0.2); /* Inner shadow for depth */
+        }
+        .ticket-preview-area::after {
+            right: calc(var(--spacing-unit) * -1.25); /* Position half outside */
+            box-shadow: inset 1px 0px 2px rgba(0,0,0,0.2); /* Inner shadow for depth */
+        }
+
+
+        .ticket-section-title {
+            font-size: var(--font-size-xl);
+            color: var(--color-accent-primary);
+            text-align: center;
+            margin-bottom: calc(var(--spacing-unit) * 2.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--color-border-primary);
+            padding-bottom: var(--spacing-unit);
+        }
+
+        .ticket-info-grid-display { /* Changed from ticket-info-grid for clarity */
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive columns */
+            gap: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2.5);
+            margin-bottom: calc(var(--spacing-unit) * 3);
+        }
+
+        .ticket-info-item-display { /* Changed from ticket-info-item */
+            padding: calc(var(--spacing-unit) * 0.5) 0;
+        }
+        .ticket-info-item-display .label {
+            display: block;
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+            margin-bottom: calc(var(--spacing-unit) * 0.25);
+            font-weight: 500;
+        }
+        .ticket-info-item-display strong,
+        .ticket-info-item-display .value { /* For consistency if you use a span with class value */
+            display: block;
+            font-size: var(--font-size-md);
+            color: var(--color-text-primary);
+            font-weight: 600;
+            word-wrap: break-word;
+        }
+        .ticket-info-item-display.main strong { /* For Movie Title and Theatre */
+            font-size: var(--font-size-lg);
+            color: var(--color-accent-secondary); /* Highlight key info */
+        }
+        .ticket-info-item-display.full-span { /* For seats list to span full width if needed */
+            grid-column: 1 / -1;
+        }
+
+        .seats-display-list { /* Changed from seats-list */
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-unit);
+        }
+        .seat-tag-item { /* Changed from seat-tag-display */
+            background-color: var(--color-surface-secondary);
+            color: var(--color-text-primary);
+            padding: calc(var(--spacing-unit) * 0.5) var(--spacing-unit);
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+        }
+
+        .ticket-qr-code-section { /* Changed from ticket-qr-code-area */
+            margin-top: calc(var(--spacing-unit) * 2);
+            padding-top: calc(var(--spacing-unit) * 2);
+            border-top: 1px dashed var(--color-border-primary);
+            text-align: center;
+        }
+        .ticket-qr-code-section h4 { /* Changed from h3 */
+            font-size: var(--font-size-md);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-unit);
+        }
+        .qr-code-image-display { /* Changed from qr-code-image */
+            width: 150px; /* Adjust size as needed */
+            height: 150px;
+            margin: 0 auto calc(var(--spacing-unit) * 1.5) auto;
+            background-color: white; /* QR codes need white background */
+            padding: var(--spacing-unit);
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .qr-code-image-display img { max-width: 100%; max-height: 100%; }
+        .qr-scan-instruction { /* Changed from qr-instruction */
+            font-size: var(--font-size-sm);
+            color: var(--color-text-tertiary);
+        }
+
+        .confirmation-page-actions { /* Changed from confirmation-actions */
+            margin-top: calc(var(--spacing-unit) * 4);
+            display: flex;
+            gap: calc(var(--spacing-unit) * 2);
+            justify-content: center;
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+        }
+        .confirmation-page-actions .btn {
+            min-width: 160px; /* Give buttons a decent min width */
+        }
+
+        .email-sent-notice { /* Changed from email-notice */
+            margin-top: calc(var(--spacing-unit) * 3);
+            font-size: var(--font-size-sm);
+            color: var(--color-text-tertiary);
+        }
+
+        /* Ensure header from style.css is applied correctly */
+        .app-header.simple-header {
+            position: static; /* Override sticky if not needed for this simple header */
+            /* Other styles from your main style.css will apply */
+        }
+         /* Styles for discount display on ticket */
+        #ticketOriginalAmountRow, #ticketDiscountRow {
+            /* display: none; /* JS will control visibility */
+        }
+        #ticketDiscountRow .label, #ticketDiscountRow .value {
+            color: var(--color-success); /* Make discount text stand out */
+        }
+
+
+        /* Print-specific styles */
+        @media print {
+            body.page-confirmation {
+                background-color: #ffffff; /* White background for printing */
+                color: #000000; /* Black text for printing */
+                padding: 0;
+                margin: 0;
+            }
+            .app-header, .app-footer, .confirmation-page-actions, .email-sent-notice, .confirmation-subtitle {
+                display: none !important; /* Hide non-ticket elements when printing */
+            }
+            .main-container.confirmation-container {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            .confirmation-card-wrapper {
+                box-shadow: none;
+                border: none;
+                padding: calc(var(--spacing-unit) * 2);
+                margin: 0;
+                max-width: 100%;
+            }
+            .ticket-preview-area {
+                border: 2px solid #000000; /* Solid border for print */
+                background-color: #f9f9f9; /* Light grey for ticket background on print */
+                padding: calc(var(--spacing-unit) * 2);
+                margin: 0;
+                box-shadow: none;
+            }
+            .ticket-preview-area::before,
+            .ticket-preview-area::after {
+                display: none; /* Hide perforated edge effect on print */
+            }
+            .ticket-section-title {
+                color: #000000;
+                border-bottom: 1px solid #ccc;
+            }
+            .ticket-info-item-display .label,
+            .ticket-info-item-display strong,
+            .ticket-info-item-display .value,
+            .seat-tag-item,
+            .ticket-qr-code-section h4,
+            .qr-scan-instruction {
+                color: #000000 !important; /* Ensure all text is black */
+            }
+            .ticket-info-item-display.main strong {
+                color: #000000 !important; /* Main info also black */
+            }
+            .qr-code-image-display {
+                border: 1px solid #ccc;
+            }
+        }
+
+    </style>
+</head>
+<body class="page-confirmation">
+
+    <header class="app-header simple-header">
+        <div class="header-content">
+            <div class="header-logo">
+                <i class="fas fa-film"></i>
+                <span>CineVerse</span>
+            </div>
+            <div class="user-profile"> <button id="themeSwitcher" class="theme-switcher" title="Toggle theme">
+                    <i class="fas fa-sun theme-switcher-icon"></i>
+                    <i class="fas fa-moon theme-switcher-icon"></i>
+                </button>
+                </div>
+        </div>
+    </header>
+
+    <main class="main-container confirmation-container">
+        <div class="confirmation-card-wrapper">
+            <div id="confirmationIconArea" class="confirmation-icon-area success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1 id="confirmationMainTitle" class="confirmation-title">Booking Confirmed!</h1>
+            <p id="confirmationSubtitle" class="confirmation-subtitle">Thank you for choosing CineVerse. Your tickets are ready.</p>
+            
+            <div id="confirmationContent" style="display: block;"> <div class="ticket-preview-area">
+                    <h2 class="ticket-section-title">Your E-Ticket</h2>
+                    <div class="ticket-info-grid-display">
+                        <div class="ticket-info-item-display main">
+                            <span class="label">Movie:</span>
+                            <strong id="ticketMovieTitle">Loading...</strong>
+                        </div>
+                        <div class="ticket-info-item-display main">
+                            <span class="label">Theatre:</span>
+                            <strong id="ticketTheatreName">Loading...</strong>
+                        </div>
+                        <div class="ticket-info-item-display">
+                            <span class="label">Booking ID:</span>
+                            <strong id="ticketBookingId">Loading...</strong>
+                        </div>
+                        <div class="ticket-info-item-display">
+                            <span class="label">Date & Time:</span>
+                            <strong id="ticketShowDateTime">Loading...</strong>
+                        </div>
+                        <div class="ticket-info-item-display">
+                            <span class="label">Screen:</span>
+                            <strong id="ticketScreenNumber">Loading...</strong>
+                        </div>
+                        
+                        <div class="ticket-info-item-display" id="ticketOriginalAmountRow" style="display: none;">
+                            <span class="label">Original Price:</span>
+                            <strong id="ticketOriginalAmount" class="value">₹0.00</strong>
+                        </div>
+                        <div class="ticket-info-item-display" id="ticketDiscountRow" style="display: none;">
+                            <span class="label">Discount (<span id="ticketDiscountCode">CODE</span>):</span>
+                            <strong id="ticketDiscountAmount" class="value">- ₹0.00</strong>
+                        </div>
+                         <div class="ticket-info-item-display">
+                            <span class="label">Total Paid:</span>
+                            <strong id="ticketTotalAmount" class="value">₹0.00</strong>
+                        </div>
+                        <div class="ticket-info-item-display full-span">
+                            <span class="label">Seats:</span>
+                            <div id="ticketSeatsList" class="seats-display-list">
+                                <span class="seat-tag-item">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ticket-qr-code-section">
+                        <h4>Scan at Cinema Entrance</h4>
+                        <div id="ticketQrCodeImage" class="qr-code-image-display">
+                            </div>
+                        <p class="qr-scan-instruction">This QR code is your entry pass.</p>
+                    </div>
+                </div>
+            </div>
+            <div id="confirmationLoadingIndicator" class="loading-indicator" style="display: none;">
+                 <i class="fas fa-spinner fa-spin"></i> Loading Confirmation...
+            </div>
+
+
+            <div class="confirmation-page-actions">
+                <button id="printTicketButton" class="btn btn-secondary">
+                    <i class="fas fa-print icon-left"></i>Print Ticket
+                </button>
+                <a href="/user-dashboard.html" id="backToHomeButton" class="btn btn-primary">
+                    <i class="fas fa-home icon-left"></i>Back to Dashboard
+                </a>
+            </div>
+            <p class="email-sent-notice">A confirmation email with your ticket details has also been sent to your registered email address.</p>
+        </div>
+    </main>
+
+    <footer class="app-footer minimal-footer">
+        <p>&copy; <span id="currentYearConfirm"></span> CineVerse. Enjoy your movie!</p>
+    </footer>
+
+    <script src="/js/common.js"></script> 
+    <script src="/js/payment-confirmation.js"></script> 
+    <script src="/js/theme-switcher.js" defer></script>
+</body>
+</html>
